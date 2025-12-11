@@ -1,0 +1,144 @@
+{
+  "welcome": "Benvenuto",
+  "settings": {
+    "title": "Impostazioni",
+    "language": "Lingua",
+    "achievements": "Obiettivi",
+    "view_badges": "Guarda i tuoi badge",
+    "daily_goal": "Obiettivo Giornaliero",
+    "strict": "Severo",
+    "normal": "Normale",
+    "balanced": "Bilanciato",
+    "generous": "Generoso",
+    "doomscroller": "Doomscroller",
+    "quick_add_defaults": "Aggiunta Rapida",
+    "default_app": "App Predefinita",
+    "default_minutes": "Tempo Predefinito",
+    "default_context": "Contesto Predefinito",
+    "add_context_placeholder": "Aggiungi contesto (es. Ufficio)",
+    "danger_zone": "Zona Pericolo",
+    "reset_data": "Reimposta Dati",
+    "reset_data_desc": "Cancella tutto e ricomincia",
+    "reset_confirm_title": "Reimposta Tutti i Dati",
+    "reset_confirm_desc": "Sei sicuro di voler cancellare tutti i tuoi dati? Questa operazione non può essere annullata.",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "save_settings": "Salva Impostazioni",
+    "manage_contexts": "Gestisci Contesti",
+    "system_contexts": "Contesti di Sistema",
+    "custom_contexts": "Contesti Personalizzati",
+    "no_custom_contexts": "Nessun contesto personalizzato.",
+    "tap_to_edit_hint": "Tocca un contesto per modificarlo o eliminarlo.",
+    "edit_context": "Modifica Contesto",
+    "add_new_context": "Aggiungi Contesto",
+    "context_placeholder": "es. Biblioteca"
+  },
+  "tabs": {
+    "home": "Home",
+    "analytics": "Analisi",
+    "settings": "Impostazioni"
+  },
+  "analytics": {
+    "title": "Analisi",
+    "no_data_title": "Nessun Dato",
+    "no_data": "Ancora nessun dato da mostrare. Inizia a registrare le sessioni per vedere i tuoi dati qui!",
+    "lifetime_statistics": "Statistiche Totali",
+    "total_debt": "Debito di Scroll Totale",
+    "time_spent_desc": "Tempo speso a scrollare in {{count}} sessioni",
+    "daily_avg": "Media G.",
+    "longest_run": "Sessione Max",
+    "most_active_day": "Giorno più attivo",
+    "most_common_context": "Contesto più comune"
+  },
+  "awards": {
+    "title": "Premi",
+    "locked": "Bloccato",
+    "unlocked": "Sbloccato",
+    "badges": {
+      "first_debt": {
+        "title": "Primo Passo",
+        "desc": "Registra la tua prima sessione."
+      },
+      "aware": {
+        "title": "Consapevole",
+        "desc": "Registra 5 sessioni."
+      },
+      "marathon": {
+        "title": "Maratoneta",
+        "desc": "Registra una sessione più lunga di 60 minuti."
+      },
+      "social_butterfly": {
+        "title": "Farfalla Sociale",
+        "desc": "Registra sessioni per 3 app diverse."
+      },
+      "explorer": {
+        "title": "Esploratore",
+        "desc": "Registra sessioni in 3 contesti diversi."
+      },
+      "night_owl": {
+        "title": "Gufo Notturno",
+        "desc": "Registra una sessione dopo le 23:00."
+      },
+      "early_bird": {
+        "title": "Mattiniero",
+        "desc": "Registra una sessione prima delle 7:00."
+      },
+      "streak_3": {
+        "title": "Costante",
+        "desc": "Registra sessioni per 3 giorni di fila."
+      },
+      "master": {
+        "title": "Maestro del Debito",
+        "desc": "Raggiungi 100 sessioni registrate."
+      },
+      "zen": {
+        "title": "Libero dallo Scroll",
+        "desc": "Registra 0 minuti di debito scroll in un giorno."
+      }
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Scroll Debt",
+      "subtitle": "Trasforma il tuo doomscrolling in\nqualcosa di epico.",
+      "feature_1": "Tracciamo il tempo di scroll",
+      "feature_2": "L'app calcola il tuo debito",
+      "feature_3": "Lo ripaghi con divertimento offline",
+      "start": "INIZIA"
+    },
+    "apps": {
+      "title": "Le tue debolezze",
+      "subtitle": "Dove sparisce il tuo tempo?",
+      "missing": "Manca qualcosa?",
+      "placeholder": "es. LinkedIn",
+      "continue": "Continua"
+    },
+    "hobbies": {
+      "title": "I tuoi hobby",
+      "subtitle": "Cose che ami fare offline.",
+      "missing": "Manca qualcosa?",
+      "placeholder": "es. Ceramica",
+      "next": "Avanti"
+    },
+    "budget": {
+      "title": "Imposta il limite",
+      "subtitle": "Quanto scroll è accettabile al giorno?",
+      "labels": {
+        "strict": "Severo",
+        "normal": "Normale",
+        "balanced": "Bilanciato",
+        "generous": "Generoso",
+        "doomscroller": "Doomscroller"
+      },
+      "finish": "Inizia il Viaggio"
+    }
+  },
+  "home": {
+    "log_scroll_session": "Registra Sessione",
+    "your_daily_budget": "Tuo Budget Giornaliero",
+    "scroll_sessions": "Sessioni di Scroll",
+    "no_sessions_yet": "Nessuna sessione ancora",
+    "edit_session": "Modifica Sessione",
+    "delete_session": "Elimina Sessione"
+  }
+}

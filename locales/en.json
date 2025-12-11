@@ -1,0 +1,144 @@
+{
+  "welcome": "Welcome",
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "achievements": "Achievements",
+    "view_badges": "View your badges",
+    "daily_goal": "Daily Goal",
+    "strict": "Strict",
+    "normal": "Normal",
+    "balanced": "Balanced",
+    "generous": "Generous",
+    "doomscroller": "Doomscroller",
+    "quick_add_defaults": "Quick Add Defaults",
+    "default_app": "Default App",
+    "default_minutes": "Default Minutes",
+    "default_context": "Default Context",
+    "add_context_placeholder": "Add context (e.g. Office)",
+    "danger_zone": "Danger Zone",
+    "reset_data": "Reset Data",
+    "reset_data_desc": "Clear everything and restart",
+    "reset_confirm_title": "Reset All Data",
+    "reset_confirm_desc": "Are you sure you want to delete all your data? This cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save_settings": "Save Settings",
+    "manage_contexts": "Manage Contexts",
+    "system_contexts": "System Contexts",
+    "custom_contexts": "Custom Contexts",
+    "no_custom_contexts": "No custom contexts yet.",
+    "tap_to_edit_hint": "Tap on a custom context to edit or delete it.",
+    "edit_context": "Edit Context",
+    "add_new_context": "Add New Context",
+    "context_placeholder": "e.g. Library"
+  },
+  "tabs": {
+    "home": "Home",
+    "analytics": "Analytics",
+    "settings": "Settings"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "no_data_title": "No Data Yet",
+    "no_data": "Still no data to display. Start logging your scroll sessions to see your habits here!",
+    "lifetime_statistics": "Lifetime Statistics",
+    "total_debt": "Total Scroll Debt",
+    "time_spent_desc": "Time spent scrolling across {{count}} sessions",
+    "daily_avg": "Daily Avg",
+    "longest_run": "Longest Run",
+    "most_active_day": "Most active day",
+    "most_common_context": "Most common context"
+  },
+  "awards": {
+    "title": "Awards",
+    "locked": "Locked",
+    "unlocked": "Unlocked",
+    "badges": {
+      "first_debt": {
+        "title": "First Step",
+        "desc": "Log your first scroll session."
+      },
+      "aware": {
+        "title": "Self Aware",
+        "desc": "Log 5 sessions."
+      },
+      "marathon": {
+        "title": "Marathoner",
+        "desc": "Log a session longer than 60 minutes."
+      },
+      "social_butterfly": {
+        "title": "Social Butterfly",
+        "desc": "Log sessions for 3 different apps."
+      },
+      "explorer": {
+        "title": "Explorer",
+        "desc": "Log sessions in 3 different contexts."
+      },
+      "night_owl": {
+        "title": "Night Owl",
+        "desc": "Log a session after 11 PM."
+      },
+      "early_bird": {
+        "title": "Early Bird",
+        "desc": "Log a session before 7 AM."
+      },
+      "streak_3": {
+        "title": "Consistent",
+        "desc": "Log sessions 3 days in a row."
+      },
+      "master": {
+        "title": "Debt Master",
+        "desc": "Reach 100 logged sessions."
+      },
+      "zen": {
+        "title": "Scroll Free",
+        "desc": "Record 0 minutes of scroll debt in a day."
+      }
+    }
+  },
+  "onboarding": {
+    "welcome": {
+      "title": "Scroll Debt",
+      "subtitle": "Turn your doomscrolling into\nsomething epic.",
+      "feature_1": "We track your scroll time",
+      "feature_2": "The app calculates your debt",
+      "feature_3": "You pay it back with offline fun",
+      "start": "START"
+    },
+    "apps": {
+      "title": "Your weak habits",
+      "subtitle": "Where does your time disappear?",
+      "missing": "Something missing?",
+      "placeholder": "e.g. LinkedIn",
+      "continue": "Continue"
+    },
+    "hobbies": {
+      "title": "Your hobbies",
+      "subtitle": "Things you love doing offline.",
+      "missing": "Something missing?",
+      "placeholder": "e.g. Pottery",
+      "next": "Next"
+    },
+    "budget": {
+      "title": "Set your limit",
+      "subtitle": "How much scrolling is okay per day?",
+      "labels": {
+        "strict": "Strict",
+        "normal": "Normal",
+        "balanced": "Balanced",
+        "generous": "Generous",
+        "doomscroller": "Doomscroller"
+      },
+      "finish": "Start the Journey"
+    }
+  },
+  "home": {
+    "log_scroll_session": "Log Scroll Session",
+    "your_daily_budget": "Your Daily Budget",
+    "scroll_sessions": "Scroll Sessions",
+    "no_sessions_yet": "No sessions yet",
+    "edit_session": "Edit Session",
+    "delete_session": "Delete Session"
+  }
+}
