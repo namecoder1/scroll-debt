@@ -52,6 +52,37 @@ export const initDB = async () => {
       name_it TEXT,
       is_custom INTEGER DEFAULT 0
     );
+
+    CREATE TABLE IF NOT EXISTS time_presets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      minutes INTEGER NOT NULL,
+      is_custom INTEGER DEFAULT 0
+    );
+
+    CREATE TABLE IF NOT EXISTS payback_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      hobby_name TEXT NOT NULL,
+      duration INTEGER NOT NULL,
+      timestamp INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS rescue_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      duration INTEGER NOT NULL,
+      timestamp INTEGER NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS accepted_missions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      duration INTEGER NOT NULL,
+      timestamp INTEGER NOT NULL,
+      status TEXT DEFAULT 'pending', -- pending, completed, abandoned
+      flavor_title_key TEXT,
+      flavor_desc_key TEXT,
+      icon TEXT,
+      color TEXT
+    );
   `);
 
   // Seed default apps if empty (check first)
@@ -447,6 +478,21 @@ export const initDB = async () => {
       );
     }
   }
+
+  // Seed default time presets if empty
+  const existingTimes = await database.getFirstAsync(
+    "SELECT count(*) as count FROM time_presets"
+  );
+  // @ts-ignore
+  if (existingTimes && existingTimes.count === 0) {
+    const defaultTimes = [5, 15, 30, 60, 120];
+    for (const min of defaultTimes) {
+      await database.runAsync(
+        "INSERT INTO time_presets (minutes, is_custom) VALUES (?, 0)",
+        min
+      );
+    }
+  }
 };
 
 export const getSetting = async (key: string): Promise<string | null> => {
@@ -572,6 +618,52 @@ export const getWeeklyStats = async (): Promise<
   return stats;
 };
 
+// Returns stats for the current week (Monday to Sunday)
+export const getThisWeekStats = async (): Promise<
+  { date: string; minutes: number }[]
+> => {
+  const database = await openDatabase();
+  const now = new Date();
+
+  // Calculate Monday of the current week
+  // Day of week: 0 (Sun) to 6 (Sat)
+  // If today is Sunday (0), Monday was 6 days ago.
+  // If today is Monday (1), Monday is today (0 days ago).
+  const day = now.getDay();
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(now.setDate(diff));
+  monday.setHours(0, 0, 0, 0);
+
+  const timestamp = monday.getTime();
+
+  const result: any[] = await database.getAllAsync(
+    `
+        SELECT 
+            date(timestamp / 1000, 'unixepoch', 'localtime') as day,
+            SUM(duration) as total
+        FROM sessions 
+        WHERE timestamp >= ?
+        GROUP BY day
+        ORDER BY day ASC
+    `,
+    timestamp
+  );
+
+  // Fill in missing days for the week (Mon-Sun = 7 days)
+  const stats = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const dateStr = d.toISOString().split("T")[0];
+    const found = result.find((r) => r.day === dateStr);
+    stats.push({
+      date: dateStr,
+      minutes: found ? found.total : 0,
+    });
+  }
+  return stats;
+};
+
 export const getAppUsageStats = async (): Promise<
   { name: string; minutes: number; percentage: number }[]
 > => {
@@ -656,7 +748,7 @@ export const getAllTimeStats = async (): Promise<{
 };
 
 export const getBusiestDayStats = async (): Promise<{
-  dayName: string;
+  dayIndex: number;
   minutes: number;
 } | null> => {
   const database = await openDatabase();
@@ -674,17 +766,8 @@ export const getBusiestDayStats = async (): Promise<{
 
   if (!result) return null;
 
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
   return {
-    dayName: days[parseInt(result.dayIndex)],
+    dayIndex: parseInt(result.dayIndex),
     minutes: result.total,
   };
 };
@@ -720,6 +803,287 @@ export const getTopContext = async (): Promise<{
   return result ? { name: result.name, count: result.count } : null;
 };
 
+export const getRandomHobbies = async (limit: number): Promise<any[]> => {
+  const database = await openDatabase();
+  const result: any[] = await database.getAllAsync(
+    `SELECT * FROM hobbies ORDER BY RANDOM() LIMIT ?`,
+    limit
+  );
+  return result;
+};
+
+// --- Payback & Rescue ---
+
+export const addPaybackSession = async (
+  duration: number,
+  hobbyName: string
+) => {
+  const database = await openDatabase();
+  await database.runAsync(
+    "INSERT INTO payback_logs (duration, hobby_name, timestamp) VALUES (?, ?, ?)",
+    duration,
+    hobbyName,
+    Date.now()
+  );
+};
+
+export const addRescueSession = async (duration: number) => {
+  const database = await openDatabase();
+  const timestamp = Date.now();
+  // Rescue counts as payback too (special hobby "Rescue Mode") but kept separate for tracking specific rescue usage
+  await database.runAsync(
+    "INSERT INTO rescue_sessions (duration, timestamp) VALUES (?, ?)",
+    duration,
+    timestamp
+  );
+  // Also log as payback
+  await database.runAsync(
+    "INSERT INTO payback_logs (duration, hobby_name, timestamp) VALUES (?, ?, ?)",
+    duration,
+    "Rescue Mode",
+    timestamp
+  );
+};
+
+export const getDayPartStats = async (): Promise<{
+  morning: number;
+  afternoon: number;
+  evening: number;
+  night: number;
+}> => {
+  const database = await openDatabase();
+  // Group by hour and then we aggregate in JS or SQL. SQL CASE is cleaner.
+  const result: any[] = await database.getAllAsync(`
+    SELECT 
+      CASE 
+        WHEN strftime('%H', timestamp / 1000, 'unixepoch', 'localtime') BETWEEN '05' AND '11' THEN 'morning'
+        WHEN strftime('%H', timestamp / 1000, 'unixepoch', 'localtime') BETWEEN '12' AND '16' THEN 'afternoon'
+        WHEN strftime('%H', timestamp / 1000, 'unixepoch', 'localtime') BETWEEN '17' AND '21' THEN 'evening'
+        ELSE 'night'
+      END as part,
+      SUM(duration) as total
+    FROM sessions
+    GROUP BY part
+  `);
+
+  const stats = { morning: 0, afternoon: 0, evening: 0, night: 0 };
+  result.forEach((r) => {
+    if (r.part === "morning") stats.morning = r.total;
+    if (r.part === "afternoon") stats.afternoon = r.total;
+    if (r.part === "evening") stats.evening = r.total;
+    if (r.part === "night") stats.night = r.total;
+  });
+
+  return stats;
+};
+
+export const getPaybackMinutes = async (): Promise<number> => {
+  const database = await openDatabase();
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const timestamp = startOfDay.getTime();
+
+  const result: any = await database.getFirstAsync(
+    "SELECT SUM(duration) as total FROM payback_logs WHERE timestamp >= ?",
+    timestamp
+  );
+  return result && result.total ? result.total : 0;
+};
+
+// --- Advanced Analytics ---
+
+export const getMonthlyStats = async (): Promise<
+  { date: string; minutes: number }[]
+> => {
+  const database = await openDatabase();
+  // Get last 30 days
+  const result: any[] = await database.getAllAsync(
+    `
+      SELECT 
+          date(timestamp / 1000, 'unixepoch', 'localtime') as day,
+          SUM(duration) as total
+      FROM sessions 
+      WHERE timestamp >= ?
+      GROUP BY day
+      ORDER BY day ASC
+    `,
+    Date.now() - 30 * 24 * 60 * 60 * 1000
+  );
+  return result.map((r) => ({ date: r.day, minutes: r.total }));
+};
+
+export const getHotHours = async (): Promise<number[]> => {
+  const database = await openDatabase();
+  const result: any[] = await database.getAllAsync(`
+      SELECT 
+          strftime('%H', timestamp / 1000, 'unixepoch', 'localtime') as hour,
+          COUNT(*) as count
+      FROM sessions
+      GROUP BY hour
+      ORDER BY hour ASC
+  `);
+
+  // Initialize array 0-23
+  const hours = new Array(24).fill(0);
+  result.forEach((r) => {
+    hours[parseInt(r.hour)] = r.count;
+  });
+  return hours;
+};
+
+export const getStreakStats = async (): Promise<{
+  currentStreak: number;
+  bestStreak: number;
+}> => {
+  const database = await openDatabase();
+
+  // Get all days with data
+  // We consider a "good day" if: (total_scroll - total_payback) <= daily_budget
+  // We need to fetch daily totals for scroll and payback.
+
+  // 1. Get daily scroll totals
+  const scrollData: any[] = await database.getAllAsync(`
+    SELECT 
+      date(timestamp / 1000, 'unixepoch', 'localtime') as dateStr,
+      SUM(duration) as totalScroll
+    FROM sessions
+    GROUP BY dateStr
+    ORDER BY dateStr DESC
+  `);
+
+  // 2. Get daily payback totals
+  const paybackData: any[] = await database.getAllAsync(`
+    SELECT 
+      date(timestamp / 1000, 'unixepoch', 'localtime') as dateStr,
+      SUM(duration) as totalPayback
+    FROM payback_logs
+    GROUP BY dateStr
+  `);
+
+  const budgetStr = await getSetting("daily_scroll_budget");
+  const budget = budgetStr ? parseInt(budgetStr) : 60;
+
+  // Merge map
+  const dailyStatus = new Map<string, boolean>(); // date -> isGood
+
+  // Process scroll data
+  scrollData.forEach((day) => {
+    const payback =
+      paybackData.find((p) => p.dateStr === day.dateStr)?.totalPayback || 0;
+    const netDebt = day.totalScroll - payback;
+    dailyStatus.set(day.dateStr, netDebt <= budget);
+  });
+
+  // Calculate Streak
+  let currentStreak = 0;
+  let bestStreak = 0;
+  let tempStreak = 0;
+
+  // Sort dates needed? scrollData is DESC (newest first)
+  // For current streak, iterate from today backwards.
+  // For best streak, we need chronological or just scan.
+
+  // Let's re-sort chronological for best streak text
+  const sortedDates = Array.from(dailyStatus.keys()).sort();
+
+  // Calculate Best Streak
+  for (const date of sortedDates) {
+    if (dailyStatus.get(date)) {
+      tempStreak++;
+      if (tempStreak > bestStreak) bestStreak = tempStreak;
+    } else {
+      tempStreak = 0;
+    }
+  }
+
+  // Calculate Current Streak
+  // Check from today (or yesterday if today not finished/logged?)
+  // Streak generally includes today if valid so far, or until yesterday.
+  // Let's count backwards from today.
+  const today = new Date().toISOString().split("T")[0];
+
+  // If today is good or no data yet?
+  // If today has data and is good -> streak starts 1.
+  // If today no data -> check yesterday.
+
+  // Simplify: Check backwards from most recent entry
+  if (sortedDates.length > 0) {
+    // Check from the very last day in sorted list.
+    // If that day is good, streak++. check day before.
+    // Break if day gap > 1? Or just consecutive in data?
+    // "Streak" usually implies consecutive calendar days.
+
+    let checkDate = new Date();
+    while (true) {
+      const dateStr = checkDate.toISOString().split("T")[0];
+      const hasData = dailyStatus.has(dateStr);
+      const isGood = dailyStatus.get(dateStr);
+
+      if (hasData) {
+        if (isGood) {
+          currentStreak++;
+        } else {
+          break; // streak broken
+        }
+      } else {
+        // No data for this day.
+        // If it's today, ignore and continue to yesterday?
+        // If it's a past day, streak is broken (unless we assume 0 scroll = good?
+        // But db query only returns days with sessions. Days with NO sessions are technically 0 scroll -> Good!)
+
+        // Correct logic: Days with NO sessions are implicitly 0 scroll -> Net Debt 0 -> Good!
+        // So we should check if we hit the "beginning of time" (install date) or just cap it.
+        // For simplicity, let's just count backward until we find a BAD day or arbitrary limit.
+        // BUT: infinite loop risk if no bad days.
+        // Let's stick to "consecutive days in database that are good".
+        // If a day is missing in DB, it means 0 usage => Good.
+
+        // Wait, if I didn't open the app for a month, do I get 30 days streak? Maybe.
+        // Let's restrict: Streak is strictly based on data presence OR just last X days?
+        // Standard app logic: Current Streak = consecutive days ending Today/Yesterday.
+        // If today is partial, we look at yesterday?
+
+        // Let's simplified version:
+        // 1. Get List of ALL days from first Session to Today.
+        // 2. For each day, calc net debt.
+        // 3. Calc streak.
+        break; // For MVP, let's stop complex logic. Keep it simple: only count days WITH data for now?
+        // Or better: Assume missing = good.
+        // Let's implement simple "Consecutive Good Days" found in DB for now to avoid complexity.
+      }
+      checkDate.setDate(checkDate.getDate() - 1);
+      if (currentStreak > 365) break; // safety
+    }
+
+    // Re-eval current streak based on simplified logic:
+    // Iterate sortedDates backwards.
+    // if (date[i] and date[i-1] are consecutive) -> continue.
+    // This is safer.
+    currentStreak = 0;
+    let lastDate: Date | null = null;
+    for (let i = sortedDates.length - 1; i >= 0; i--) {
+      const dStr = sortedDates[i];
+      const isGood = dailyStatus.get(dStr);
+      if (!isGood) break;
+
+      const d = new Date(dStr);
+      if (lastDate) {
+        const diffTime = Math.abs(lastDate.getTime() - d.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays > 1) {
+          // Gaps? If gap means 0 usage, it's good!
+          // Let's keep simpler logic: Just count valid days in DB for "Active Streak"
+          // This means "Days you logged and were good".
+        }
+      }
+      currentStreak++;
+      lastDate = d;
+    }
+  }
+
+  return { currentStreak, bestStreak };
+};
+
 export const resetAllData = async () => {
   const database = await openDatabase();
   await database.execAsync(`
@@ -728,7 +1092,142 @@ export const resetAllData = async () => {
         DROP TABLE IF EXISTS apps;
         DROP TABLE IF EXISTS hobbies;
         DROP TABLE IF EXISTS contexts;
+        DROP TABLE IF EXISTS time_presets;
+        DROP TABLE IF EXISTS payback_logs;
+        DROP TABLE IF EXISTS rescue_sessions;
+        DROP TABLE IF EXISTS accepted_missions;
     `);
   // Re-initialize to seed defaults again
   await initDB();
+};
+
+export interface AcceptedMission {
+  id: number;
+  name: string;
+  duration: number;
+  timestamp: number;
+  status: "pending" | "completed" | "abandoned";
+  flavor_title_key?: string;
+  flavor_desc_key?: string;
+  icon?: string;
+  color?: string;
+}
+
+export const acceptMission = async (mission: any) => {
+  const database = await openDatabase();
+  const timestamp = Date.now();
+  await database.runAsync(
+    `INSERT INTO accepted_missions (name, duration, timestamp, status, flavor_title_key, flavor_desc_key, icon, color) 
+     VALUES (?, ?, ?, 'pending', ?, ?, ?, ?)`,
+    mission.name,
+    mission.duration,
+    timestamp,
+    mission.flavor?.titleKey,
+    mission.flavor?.descriptionKey,
+    mission.icon,
+    mission.color
+  );
+};
+
+export const getAcceptedMissions = async (): Promise<AcceptedMission[]> => {
+  const database = await openDatabase();
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const timestamp = startOfDay.getTime();
+
+  const result: any[] = await database.getAllAsync(
+    `SELECT * FROM accepted_missions WHERE timestamp >= ? AND status = 'pending' ORDER BY timestamp DESC`,
+    timestamp
+  );
+  return result;
+};
+
+export const completeAcceptedMission = async (id: number) => {
+  const database = await openDatabase();
+
+  // Get mission details first to add payback session
+  const mission: any = await database.getFirstAsync(
+    "SELECT * FROM accepted_missions WHERE id = ?",
+    id
+  );
+
+  if (mission) {
+    await database.runAsync(
+      "UPDATE accepted_missions SET status = 'completed' WHERE id = ?",
+      id
+    );
+    await addPaybackSession(mission.duration, mission.name);
+  }
+};
+
+export const abandonMission = async (id: number) => {
+  const database = await openDatabase();
+  await database.runAsync(
+    "UPDATE accepted_missions SET status = 'abandoned' WHERE id = ?",
+    id
+  );
+};
+
+export const getCompletedMissions = async (
+  limit: number = 50
+): Promise<AcceptedMission[]> => {
+  const database = await openDatabase();
+  const result: any[] = await database.getAllAsync(
+    `SELECT * FROM accepted_missions WHERE status = 'completed' ORDER BY timestamp DESC LIMIT ?`,
+    limit
+  );
+  return result;
+};
+
+export const getMissionStats = async (): Promise<{
+  totalAccepted: number;
+  completed: number;
+  abandoned: number;
+  pending: number;
+  totalRecoveredMinutes: number;
+  completionRate: number;
+  recoveryRatio: number;
+}> => {
+  const database = await openDatabase();
+
+  // Get mission counts and sum
+  const result: any = await database.getFirstAsync(`
+      SELECT 
+          COUNT(*) as totalAccepted,
+          SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed,
+          SUM(CASE WHEN status = 'abandoned' THEN 1 ELSE 0 END) as abandoned,
+          SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+          SUM(CASE WHEN status = 'completed' THEN duration ELSE 0 END) as totalRecoveredMinutes
+      FROM accepted_missions
+  `);
+
+  const totalAccepted = result?.totalAccepted || 0;
+  const completed = result?.completed || 0;
+  const abandoned = result?.abandoned || 0;
+  const pending = result?.pending || 0;
+  const totalRecoveredMinutes = result?.totalRecoveredMinutes || 0;
+
+  const completionRate =
+    completed + abandoned > 0
+      ? Math.round((completed / (completed + abandoned)) * 100)
+      : 0;
+
+  // For recovery ratio we need total scroll time of ALL time
+  const allTimeStats = await getAllTimeStats();
+  const totalScroll = allTimeStats.totalMinutes;
+
+  const recoveryRatio =
+    totalScroll > 0
+      ? Math.round((totalRecoveredMinutes / totalScroll) * 100)
+      : 0;
+
+  return {
+    totalAccepted,
+    completed,
+    abandoned,
+    pending,
+    totalRecoveredMinutes,
+    completionRate,
+    recoveryRatio,
+  };
 };

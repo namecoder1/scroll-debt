@@ -1,3 +1,4 @@
+import ProgressBar from '@/components/onboarding/ProgressBar';
 import Button from '@/components/ui/button';
 import { setSetting } from '@/lib/db';
 import { cn } from '@/lib/utils';
@@ -29,12 +30,15 @@ export default function BudgetSelectionScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background p-6">
-      <View className='mt-4'>
-        <View className="mb-6">
+    <SafeAreaView className="flex-1 bg-background">
+      <View className='flex-1 px-6'>
+        <View className="mt-4 mb-6">
+          <ProgressBar currentStep={3} totalSteps={3} />
           <Text className="text-3xl font-black text-foreground">{t('onboarding.budget.title')}</Text>
           <Text className="text-muted-foreground mt-2 text-lg">{t('onboarding.budget.subtitle')}</Text>
         </View>
+
+
 
         <View className="items-center justify-center p-8 bg-card rounded-3xl border-2 border-border shadow-sm">
           <Text className="text-6xl font-black text-foreground mb-1">{budget}m</Text>

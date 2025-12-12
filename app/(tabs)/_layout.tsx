@@ -55,6 +55,7 @@ export default function TabLayout() {
       <View className="absolute bottom-[50px] w-full items-center pointer-events-box-none" pointerEvents="box-none">
         <Link href="/add-session" asChild>
           <TouchableOpacity
+            onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)}
             className="bg-primary h-14 w-14 rounded-full items-center justify-center shadow-lg"
             style={{
               shadowColor: "#000",

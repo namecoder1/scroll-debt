@@ -1,3 +1,4 @@
+import ProgressBar from '@/components/onboarding/ProgressBar';
 import Button from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { openDatabase } from '@/lib/db';
@@ -64,12 +65,16 @@ export default function HobbiesSelectionScreen() {
 			<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				className="flex-1"
+				keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
 			>
 				<View className="flex-1 px-6" style={{ paddingTop: insets.top, paddingBottom: 0 }}>
 					<View className="mb-6 mt-4">
+						<ProgressBar currentStep={2} totalSteps={3} />
 						<Text className="text-3xl font-black text-foreground">{t('onboarding.hobbies.title')}</Text>
 						<Text className="text-muted-foreground mt-2 text-lg">{t('onboarding.hobbies.subtitle')}</Text>
 					</View>
+
+
 
 					<ScrollView className="flex-1" contentContainerClassName="pb-48" showsVerticalScrollIndicator={false}>
 						<View className="gap-6">

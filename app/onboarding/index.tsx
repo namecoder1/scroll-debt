@@ -1,4 +1,5 @@
-import logo from '@/assets/images/logo.png';
+import logoLight from '@/assets/images/logo-light.png';
+import logoDark from '@/assets/images/logo-dark.png';
 
 import Button from '@/components/ui/button';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,12 +15,14 @@ export default function WelcomeScreen() {
 	const router = useRouter();
 	const colorScheme = useColorScheme();
 
+	const image = colorScheme === 'dark' ? logoLight : logoDark;
+
 	return (
 		<SafeAreaView className="flex-1 bg-background justify-between items-center p-6">
 			<View className="flex-1 w-full justify-center items-center gap-2">
 				<View className="items-center gap-4">
 					<Image
-						source={logo}
+						source={image}
 						className="w-40 h-40"
 						contentFit="contain"
 						transition={1000}

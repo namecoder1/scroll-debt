@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -19,6 +20,7 @@ export default function SettingsScreen() {
 	const insets = useSafeAreaInsets();
 	const [apps, setApps] = useState<any[]>([]);
 	const [contexts, setContexts] = useState<any[]>([]);
+	const [times, setTimes] = useState<any[]>([]);
 
 	const [dailyBudget, setDailyBudget] = useState(60);
 	const [language, setLanguage] = useState(i18n.language);
@@ -44,6 +46,10 @@ export default function SettingsScreen() {
 		// Load contexts
 		const contextsRes: any[] = await db.getAllAsync('SELECT * FROM contexts');
 		setContexts(contextsRes);
+
+		// Load time presets
+		const timesRes: any[] = await db.getAllAsync('SELECT * FROM time_presets ORDER BY minutes ASC');
+		setTimes(timesRes);
 
 		// Load stored defaults
 		const defApp = await getSetting('default_app');
@@ -80,7 +86,10 @@ export default function SettingsScreen() {
 	return (
 		<View className="flex-1 bg-background">
 			<View className="flex-row items-center px-4 border-b border-border" style={{ paddingTop: insets.top, height: 60 + insets.top }}>
-				<TouchableOpacity onPress={() => router.back()} className="mr-4">
+				<TouchableOpacity onPress={() => {
+					Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+					router.back()
+				}} className="mr-4">
 					<Ionicons name="arrow-back" size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
 				</TouchableOpacity>
 				<Text className="text-2xl font-bold text-foreground">{t('settings.title')}</Text>
@@ -89,12 +98,15 @@ export default function SettingsScreen() {
 			<View className="flex-1">
 				<ScrollView
 					className="flex-1 px-4 py-6"
-					contentContainerClassName="pb-48"
+					contentContainerClassName="pb-40"
 					showsVerticalScrollIndicator={false}
 				>
 					<TouchableOpacity
-						onPress={() => router.push('/awards')}
-						className="flex-row items-center justify-between bg-card p-4 rounded-xl border border-border mb-8"
+						onPress={() => {
+							Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+							router.push('/awards')
+						}}
+						className="flex-row items-center justify-between bg-card p-4 rounded-3xl border border-border mb-4"
 					>
 						<View className="flex-row items-center gap-3">
 							<View className="bg-yellow-100 dark:bg-yellow-900 p-2 rounded-full">
@@ -109,9 +121,9 @@ export default function SettingsScreen() {
 					</TouchableOpacity>
 
 					{/* Defaults Configuration */}
-					<View className="mb-8">
-						<Text className="text-xl font-bold text-foreground mb-4">{t('settings.daily_goal')}</Text>
-						<View className="bg-card p-4 rounded-xl border border-border gap-6">
+					<View className="mb-4">
+						<View className="bg-card p-4 rounded-3xl border border-border gap-6">
+						<Text className="text-xl font-bold text-foreground">{t('settings.daily_goal')}</Text>
 							<View className="items-center">
 								<Text className="text-4xl font-black text-foreground mb-1">{dailyBudget}m</Text>
 								<Text className={cn("text-sm font-bold uppercase tracking-widest mb-4",
@@ -129,7 +141,10 @@ export default function SettingsScreen() {
 									maximumValue={240}
 									step={15}
 									value={dailyBudget}
-									onValueChange={setDailyBudget}
+									onValueChange={(value) => {
+										Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+										setDailyBudget(value)
+									}}
 									minimumTrackTintColor={colorScheme === 'dark' ? 'white' : 'black'}
 									maximumTrackTintColor={colorScheme === 'dark' ? '#333' : '#d3d3d3'}
 								/>
@@ -150,11 +165,23 @@ export default function SettingsScreen() {
 							<View>
 								<Text className="text-muted-foreground mb-2 font-medium">{t('settings.default_app')}</Text>
 								<ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row gap-2">
+									<TouchableOpacity
+										onPress={() => {
+											Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      router.push({ pathname: '/settings/manage' as any, params: { type: 'apps' } });
+										}}
+										className="px-2.5 py-1.5 rounded-2xl border border-border items-center justify-center bg-primary mr-2"
+									>
+										<Ionicons name="add" size={20} color={colorScheme === 'dark' ? 'black' : 'white'} />
+									</TouchableOpacity>
 									{apps.map(app => (
 										<TouchableOpacity
 											key={app.id}
-											onPress={() => setDefaultApp(app.name)}
-											className={`flex-1 px-4 mr-1 py-2 rounded-lg border items-center ${defaultApp === app.name ? 'bg-primary border-primary' : 'bg-background border-border'}`}
+											onPress={() => {
+												Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+												setDefaultApp(app.name)
+											}}
+											className={`flex-1 px-4 mr-1 py-2.5 rounded-2xl border items-center ${defaultApp === app.name ? 'bg-primary border-primary' : 'bg-background border-border'}`}
 										>
 											<Text className={defaultApp === app.name ? 'text-primary-foreground font-semibold' : 'text-foreground'}>
 												{i18n.language === 'it' ? (app.name_it || app.name) : app.name}
@@ -168,13 +195,25 @@ export default function SettingsScreen() {
 							<View>
 								<Text className="text-muted-foreground mb-2 font-medium">{t('settings.default_minutes')}</Text>
 								<ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row gap-2">
-									{['5', '15', '30', '60'].map(dur => (
+									<TouchableOpacity
+										onPress={() => {
+											Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      router.push({ pathname: '/settings/manage' as any, params: { type: 'times' } });
+										}}
+										className="px-2.5 py-1.5 rounded-2xl border border-border items-center justify-center bg-primary mr-2"
+									>
+										<Ionicons name="add" size={20} color={colorScheme === 'dark' ? 'black' : 'white'} />
+									</TouchableOpacity>
+									{times.map(tItem => (
 										<TouchableOpacity
-											key={dur}
-											onPress={() => setDefaultDuration(dur)}
-											className={`flex-1 px-4 py-2 rounded-lg border items-center mr-1 ${defaultDuration === dur ? 'bg-primary border-primary' : 'bg-background border-border'}`}
+											key={tItem.id}
+											onPress={() => {
+												Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+												setDefaultDuration(tItem.minutes.toString())
+											}}
+											className={`flex-1 px-4 py-2.5 rounded-2xl border items-center mr-1 ${defaultDuration === tItem.minutes.toString() ? 'bg-primary border-primary' : 'bg-background border-border'}`}
 										>
-											<Text className={defaultDuration === dur ? 'text-primary-foreground font-semibold' : 'text-foreground'}>{dur}m</Text>
+											<Text className={defaultDuration === tItem.minutes.toString() ? 'text-primary-foreground font-semibold' : 'text-foreground'}>{tItem.minutes}m</Text>
 										</TouchableOpacity>
 									))}
 								</ScrollView>
@@ -184,11 +223,24 @@ export default function SettingsScreen() {
 							<View>
 								<Text className="text-muted-foreground mb-2 font-medium">{t('settings.default_context')}</Text>
 								<ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row flex-wrap gap-2 mb-1">
+									<TouchableOpacity
+										onPress={() => {
+											Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+											router.push({ pathname: '/settings/manage' as any, params: { type: 'contexts' } });
+										}}
+										className="px-2.5 py-1.5 rounded-2xl border border-border items-center justify-center bg-primary mr-2"
+									>
+										<Ionicons name="add" size={20} color={colorScheme === 'dark' ? 'black' : 'white'} />
+									</TouchableOpacity>
+
 									{contexts.map(ctx => (
 										<TouchableOpacity
 											key={ctx.id}
-											onPress={() => setDefaultContext(ctx.name)}
-											className={`px-4 py-2 rounded-lg border items-center mr-1 ${defaultContext === ctx.name ? 'bg-primary border-primary' : 'bg-background border-border'}`}
+											onPress={() => {
+												Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+												setDefaultContext(ctx.name)
+											}}
+											className={`flex-1 px-4 py-2.5 rounded-2xl border items-center mr-1 ${defaultContext === ctx.name ? 'bg-primary border-primary' : 'bg-background border-border'}`}
 										>
 											<Text className={defaultContext === ctx.name ? 'text-primary-foreground font-semibold' : 'text-foreground'}>
 												{i18n.language === 'it' ? (ctx.name_it || ctx.name) : ctx.name}
@@ -196,12 +248,7 @@ export default function SettingsScreen() {
 										</TouchableOpacity>
 									))}
 
-									<TouchableOpacity
-										onPress={() => router.push('/settings/contexts')}
-										className="w-10 px-0 py-2 rounded-lg border border-dashed border-border items-center justify-center bg-card mr-4"
-									>
-										<Ionicons name="add" size={20} color={colorScheme === 'dark' ? 'white' : 'black'} />
-									</TouchableOpacity>
+									
 								</ScrollView>
 							</View>
 
@@ -216,10 +263,11 @@ export default function SettingsScreen() {
 									<TouchableOpacity
 										key={lang}
 										onPress={() => {
+											Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 											setLanguage(lang);
 											i18n.changeLanguage(lang);
 										}}
-										className={`flex-1 px-4 py-3 rounded-lg border items-center ${language === lang ? 'bg-primary border-primary' : 'bg-background border-border'}`}
+										className={`flex-1 px-4 py-3 rounded-2xl border items-center ${language === lang ? 'bg-primary border-primary' : 'bg-background border-border'}`}
 									>
 										<Text className={language === lang ? 'text-primary-foreground font-semibold' : 'text-foreground'}>
 											{lang === 'en' ? 'English' : 'Italiano'}
@@ -243,6 +291,7 @@ export default function SettingsScreen() {
 											text: t('settings.delete'),
 											style: "destructive",
 											onPress: async () => {
+												Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 												await resetAllData();
 												router.replace('/onboarding');
 											}
@@ -263,6 +312,12 @@ export default function SettingsScreen() {
 							</View>
 							<Ionicons name="chevron-forward" size={24} color="#ef4444" />
 						</TouchableOpacity>
+					</View>
+
+
+					<View className='pt-8 flex-col items-center justify-center gap-1'>
+						<Text className='text-foreground text-lg font-bold'>v0.1.0</Text>
+						<Text className='text-muted-foreground text-base'>Creato da Tobia Bartolomei</Text>
 					</View>
 
 				</ScrollView>
@@ -288,7 +343,12 @@ export default function SettingsScreen() {
 
 				<View className="absolute bottom-6 left-6 right-6">
 					<Button
-						onPress={saveDefaults}
+						onPress={() => {
+							Haptics.notificationAsync(
+								Haptics.NotificationFeedbackType.Success
+							)
+							saveDefaults()
+						}}
 						className="w-full rounded-full"
 						size="xl"
 					>

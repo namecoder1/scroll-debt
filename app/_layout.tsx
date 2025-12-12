@@ -77,7 +77,9 @@ export default function RootLayout() {
           <Stack.Screen name='(tabs)' />
           <Stack.Screen name='onboarding' />
           <Stack.Screen name='awards/index' options={{ presentation: 'modal', headerTitle: 'Awards' }} />
-          <Stack.Screen name='settings/contexts' options={{ presentation: 'modal' }} />
+          <Stack.Screen name='settings/manage' options={{ presentation: 'modal' }} />
+          <Stack.Screen name='missions/index' options={{ presentation: 'modal' }} />
+          <Stack.Screen name='missions/pasts' options={{ presentation: 'modal' }} />
         </Stack>
         <PortalHost />
       </SafeAreaProvider>

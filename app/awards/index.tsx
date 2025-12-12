@@ -1,10 +1,12 @@
 import { getTodayScrollMinutes, openDatabase } from '@/lib/db';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 
 interface Badge {
   id: string;
@@ -22,6 +24,7 @@ export default function AwardsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
   const [badges, setBadges] = useState<Badge[]>([]);
 
   useEffect(() => {
@@ -157,16 +160,24 @@ export default function AwardsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <View className="flex-row items-center p-6">
-        <TouchableOpacity onPress={() => router.back()} className="mr-4">
+    <View className="flex-1 bg-background" >
+      <View className="flex-row items-center p-6 pb-6 border-b border-border">
+        <TouchableOpacity 
+          onPress={() => {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+            router.back()}
+          } 
+          className="mr-4">
           <Ionicons name="arrow-back" size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
         </TouchableOpacity>
         <Text className="text-3xl font-black text-foreground">{t('awards.title')}</Text>
       </View>
 
-      <ScrollView className="flex-1 p-4">
-        <View className="flex-row flex-wrap justify-center gap-4 pt-6 pb-20">
+      <ScrollView 
+        className="flex-1 p-4"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+      >
+        <View className="flex-row flex-wrap justify-center gap-4">
           {badges.map(badge => {
             const currentBadgeColor = colorScheme === 'dark' ? badge.color.dark : badge.color.light;
 
@@ -198,6 +209,6 @@ export default function AwardsScreen() {
           })}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Animated, Text, TouchableOpacity, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 
@@ -11,6 +13,7 @@ interface SessionItemProps {
 
 export default function SessionItem({ session, onDelete }: SessionItemProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [leftOpen, setLeftOpen] = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
 
@@ -34,9 +37,12 @@ export default function SessionItem({ session, onDelete }: SessionItemProps) {
           return (
             <TouchableOpacity
               className="w-20 h-full"
-              onPress={onDelete}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onDelete()
+              }}
             >
-              <Animated.View className="bg-destructive w-full h-full justify-center items-center rounded-r-xl" style={{ opacity }}>
+              <Animated.View className="bg-destructive w-full h-full justify-center items-center rounded-r-3xl" style={{ opacity }}>
                 <Ionicons name="trash-outline" size={24} color="white" />
               </Animated.View>
             </TouchableOpacity>
@@ -52,6 +58,7 @@ export default function SessionItem({ session, onDelete }: SessionItemProps) {
             <TouchableOpacity
               className="w-20 h-full"
               onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 router.push({
                   pathname: '/add-session',
                   params: {
@@ -63,7 +70,7 @@ export default function SessionItem({ session, onDelete }: SessionItemProps) {
                 });
               }}
             >
-              <Animated.View className="bg-blue-600 w-full h-full justify-center items-center rounded-l-xl" style={{ opacity }}>
+              <Animated.View className="bg-blue-600 w-full h-full justify-center items-center rounded-l-3xl" style={{ opacity }}>
                 <Ionicons name="create" size={24} color="white" />
               </Animated.View>
             </TouchableOpacity>
@@ -80,14 +87,14 @@ export default function SessionItem({ session, onDelete }: SessionItemProps) {
       >
         <View
           className={`flex-row justify-between items-center bg-card p-4 border border-border 
-                    ${leftOpen ? 'rounded-l-none' : 'rounded-l-xl'} 
-                    ${rightOpen ? 'rounded-r-none' : 'rounded-r-xl'}`}
+                    ${leftOpen ? 'rounded-l-none' : 'rounded-l-3xl'} 
+                    ${rightOpen ? 'rounded-r-none' : 'rounded-r-3xl'}`}
         >
           <View>
             <Text className="text-foreground font-semibold">{session.app_name || 'Unknown App'}</Text>
             {session.context && (
               <Text className="text-xs text-muted-foreground bg-secondary self-start px-2 py-0.5 rounded-md overflow-hidden mt-1">
-                {session.context}
+                {t('analytics.contexts.' + session.context, { defaultValue: session.context })}
               </Text>
             )}
           </View>
