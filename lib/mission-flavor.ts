@@ -11,9 +11,18 @@ export const getMissionFlavor = (category: string): MissionFlavor => {
   // We will define multiple variants per category in translation files
   // e.g., missions.creative.title_1, missions.creative.desc_1
 
-  const variant = Math.floor(Math.random() * 15) + 1; // 1 to 3
+  const variant = Math.floor(Math.random() * 15) + 1; // 1 to 15
 
   // Fallback for unknown categories
+  // Fallback for unknown categories
+  if (category === "Custom") {
+    const customVariant = Math.floor(Math.random() * 5) + 1; // 1 to 5
+    return {
+      titleKey: `missions.custom.title_${customVariant}`,
+      descriptionKey: `missions.custom.desc_${customVariant}`,
+    };
+  }
+
   const safeCategory = [
     "Creative",
     "Active",

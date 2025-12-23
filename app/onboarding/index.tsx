@@ -1,11 +1,11 @@
-import logoLight from '@/assets/images/logo-light.png';
-import logoDark from '@/assets/images/logo-dark.png';
+import logoDark from '@/assets/images/logo-light.png';
+import logoLight from '@/assets/images/logo-dark.png';
 
 import Button from '@/components/ui/button';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Text, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -38,8 +38,8 @@ export default function WelcomeScreen() {
 				</Text>
 			</View>
 
-			<View className="w-full gap-12 mb-6">
-				<View className="gap-6 px-4">
+			<View className="w-full gap-8 mb-6 bg-muted/40 pt-6 rounded-3xl">
+				<View className="gap-6 px-6">
 					<FeatureItem
 						icon="eye-outline"
 						text={t('onboarding.welcome.feature_1')}
@@ -57,15 +57,22 @@ export default function WelcomeScreen() {
 				<Button
 					onPress={() => {
 						Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-						router.push('/onboarding/apps')
+						router.push('/onboarding/guide')
 					}}
 					size='xl'
 					className='rounded-full w-full'
 				>
-					<Text className="text-white dark:text-black mx-auto text-center font-bold text-xl tracking-wider">
+					<Text className="text-white dark:text-black mx-auto text-center font-semibold text-xl tracking-wider">
 						{t('onboarding.welcome.start')}
 					</Text>
 				</Button>
+			</View>
+
+			<View className='flex-row mt-2 items-center justify-center gap-4'>
+				<Link href="https://scroll-debt.vercel.app/privacy" className="text-muted-foreground text-xs">{t('settings.privacy')}</Link>	
+				<Link href="https://scroll-debt.vercel.app/terms" className="text-muted-foreground text-xs">{t('settings.terms')}</Link>	
+				<Link href="https://scroll-debt.vercel.app/security" className="text-muted-foreground text-xs">{t('settings.security')}</Link>	
+				<Link href="https://scroll-debt.vercel.app/faq" className="text-muted-foreground text-xs">{t('settings.faq')}</Link>	
 			</View>
 		</SafeAreaView>
 	);

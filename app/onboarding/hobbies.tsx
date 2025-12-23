@@ -1,4 +1,4 @@
-import ProgressBar from '@/components/onboarding/ProgressBar';
+import ProgressBar from '@/components/onboarding/progress-bar';
 import Button from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { openDatabase } from '@/lib/db';
@@ -9,9 +9,9 @@ import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HobbiesSelectionScreen() {
@@ -20,6 +20,20 @@ export default function HobbiesSelectionScreen() {
 	const colorScheme = useColorScheme();
 	const [hobbies, setHobbies] = useState<{ id: number, name: string, name_it?: string, selected: boolean, is_custom?: number, category?: string, category_it?: string }[]>([]);
 	const [customHobby, setCustomHobby] = useState('');
+	const scrollRef = useRef<ScrollView>(null);
+	const inputRef = useRef<TextInput>(null);
+
+	useEffect(() => {
+		const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+			if (inputRef.current?.isFocused()) {
+				scrollRef.current?.scrollToEnd({ animated: true });
+			}
+		});
+
+		return () => {
+			showSubscription.remove();
+		};
+	}, []);
 
 	useEffect(() => {
 		async function loadHobbies() {
@@ -65,18 +79,24 @@ export default function HobbiesSelectionScreen() {
 			<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				className="flex-1"
-				keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+				keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
 			>
 				<View className="flex-1 px-6" style={{ paddingTop: insets.top, paddingBottom: 0 }}>
 					<View className="mb-6 mt-4">
 						<ProgressBar currentStep={2} totalSteps={3} />
-						<Text className="text-3xl font-black text-foreground">{t('onboarding.hobbies.title')}</Text>
+						<Text className="text-3xl font-black tracking-tighter text-foreground">{t('onboarding.hobbies.title')}</Text>
 						<Text className="text-muted-foreground mt-2 text-lg">{t('onboarding.hobbies.subtitle')}</Text>
 					</View>
 
 
 
-					<ScrollView className="flex-1" contentContainerClassName="pb-48" showsVerticalScrollIndicator={false}>
+					<ScrollView 
+						ref={scrollRef}
+						className="flex-1" 
+						contentContainerClassName="pb-48" 
+						showsVerticalScrollIndicator={false}
+						keyboardShouldPersistTaps='handled'
+					>
 						<View className="gap-6">
 							{Object.entries(
 								hobbies.reduce((acc, hobby) => {
@@ -104,10 +124,10 @@ export default function HobbiesSelectionScreen() {
 													toggleHobby(hobby.id)
 												}}
 												variant={hobby.selected ? 'default' : 'outline'}
-												size="lg"
+												size="xl"
 											>
 												<View className="flex-row items-center gap-2">
-													<Text className={cn('text-black dark:text-white', hobby.selected && 'text-white dark:text-black')}>
+													<Text className={cn('text-black dark:text-white text-base', hobby.selected && 'text-white dark:text-black')}>
 														{i18n.language === 'it' ? (hobby.name_it || hobby.name) : hobby.name}
 													</Text>
 													{!!hobby.is_custom && (
@@ -134,6 +154,7 @@ export default function HobbiesSelectionScreen() {
 							<Text className="text-foreground font-bold mb-3 ml-1">{t('onboarding.hobbies.missing')}</Text>
 							<View className="flex-row gap-2">
 								<Input
+									ref={inputRef}
 									className='bg-input text-foreground flex-1'
 									placeholder={t('onboarding.hobbies.placeholder')}
 									placeholderTextColor="#94a3b8"
@@ -185,6 +206,11 @@ export default function HobbiesSelectionScreen() {
 					</View>
 
 					<View className="absolute bottom-6 left-6 right-6">
+						{selectedCount === 0 && (
+							<View className='mb-2'>
+								<Text className="text-center text-xs text-foreground">{t('onboarding.hobbies.at_least')}</Text>
+							</View>
+						)}
 						<Button
 							onPress={() => {
 								Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)
@@ -194,7 +220,10 @@ export default function HobbiesSelectionScreen() {
 							size='xl'
 							className='rounded-full w-full'
 						>
-							<Text className="text-primary-foreground mx-auto font-black text-xl">{t('onboarding.hobbies.next')}</Text>
+							<Text className={cn(
+								selectedCount === 0 ? 'text-foreground/50' : 'text-white dark:text-black',
+								'mx-auto font-semibold text-xl'
+							)}>{t('onboarding.hobbies.next')}</Text>
 						</Button>
 					</View>
 				</View>

@@ -93,7 +93,7 @@ export default function SessionItem({ session, onDelete }: SessionItemProps) {
           <View>
             <Text className="text-foreground font-semibold">{session.app_name || 'Unknown App'}</Text>
             {session.context && (
-              <Text className="text-xs text-muted-foreground bg-secondary self-start px-2 py-0.5 rounded-md overflow-hidden mt-1">
+              <Text className="text-xs text-foreground bg-muted self-start px-2 py-0.5 rounded-md overflow-hidden mt-1">
                 {t('analytics.contexts.' + session.context, { defaultValue: session.context })}
               </Text>
             )}

@@ -1,3 +1,4 @@
+import { TourTarget } from '@/components/tour/TourTarget';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { Link, Tabs } from 'expo-router';
@@ -10,64 +11,69 @@ export default function TabLayout() {
 
   return (
     <View className="flex-1">
-      <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarActiveTintColor: colorScheme === 'dark' ? '#fff' : '#000',
-          tabBarStyle: {
-            backgroundColor: colorScheme === 'dark' ? '#222' : '#fff',
-            borderColor: colorScheme === 'dark' ? '#222' : '#ddd',
-            paddingTop: 10,
-            borderTopWidth: 1,
-            elevation: 0,
-          },
-        }}>
-        <Tabs.Screen
-          name="index"
-          listeners={{
-            tabPress: () => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+      <View className='pb-2 flex-1' style={{ backgroundColor: colorScheme === 'dark' ? '#2a2b27' : '#c3c7b9' }}>
+        <Tabs
+          screenOptions={{
+            headerShown: false,
+            tabBarActiveTintColor: colorScheme === 'dark' ? '#C9F655' : '#4D542B',
+            tabBarStyle: {
+              backgroundColor: colorScheme === 'dark' ? '#2a2b27' : '#c3c7b9',
+              borderColor: colorScheme === 'dark' ? '#222' : '#afb3a6',
+              paddingTop: 10,
+              paddingBottom: 10,
+              borderTopWidth: 1,
+              elevation: 0,
             },
-          }}
-          options={{
-            title: t('tabs.home'),
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home-outline" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="analytics"
-          listeners={{
-            tabPress: () => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-            },
-          }}
-          options={{
-            title: t('tabs.analytics'),
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="stats-chart-outline" size={size} color={color} />
-            ),
-          }}
-        />
-      </Tabs>
-
-      <View className="absolute bottom-[50px] w-full items-center pointer-events-box-none" pointerEvents="box-none">
-        <Link href="/add-session" asChild>
-          <TouchableOpacity
-            onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)}
-            className="bg-primary h-14 w-14 rounded-full items-center justify-center shadow-lg"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 4.65,
-              elevation: 8,
+          }}>
+          <Tabs.Screen
+            name="index"
+            listeners={{
+              tabPress: () => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+              },
             }}
-          >
-            <Ionicons name="add" size={32} color={colorScheme === 'dark' ? '#000' : '#fff'} />
-          </TouchableOpacity>
-        </Link>
+            options={{
+              title: t('tabs.home'),
+              tabBarIcon: ({ color, size, focused }) => (
+                <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="analytics"
+            listeners={{
+              tabPress: () => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+              },
+            }}
+            options={{
+              title: t('tabs.analytics'),
+              tabBarIcon: ({ color, size, focused }) => (
+                <Ionicons name={focused ? 'stats-chart' : 'stats-chart-outline'} size={size} color={color} />
+              ),
+            }}
+          />
+        </Tabs>
+
+        <View className="absolute bottom-[60px] w-full items-center pointer-events-box-none" pointerEvents="box-none">
+          <TourTarget id="add-button">
+            <Link href="/add-session" asChild>
+              <TouchableOpacity
+                onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)}
+                className="bg-primary h-14 w-14 rounded-full items-center justify-center shadow-lg"
+                style={{
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 4 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 4.65,
+                  elevation: 8,
+                }}
+              >
+                <Ionicons name="add" size={32} color={colorScheme === 'dark' ? '#000' : '#fff'} />
+              </TouchableOpacity>
+            </Link>
+          </TourTarget>
+        </View>
       </View>
     </View>
   );

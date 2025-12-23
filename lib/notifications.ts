@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
+
 export async function initNotifications() {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -28,7 +29,7 @@ export async function initNotifications() {
   }
 
   if (finalStatus !== 'granted') {
-    console.log('Notification permissions not granted');
+    console.error('Notification permissions not granted');
     return;
   }
 
@@ -67,6 +68,4 @@ async function scheduleDailyReminders() {
       minute: 0,
     },
   });
-
-  console.log("Scheduled daily reminders for 12:00 and 18:00");
 }

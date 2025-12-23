@@ -2,13 +2,12 @@ import '@/global.css';
 import { Image } from 'expo-image';
 import { cssInterop } from 'nativewind';
 
-cssInterop(Image, {
-  className: 'style',
-});
-
+import { AwardsProvider } from '@/components/awards/awards-provider';
+import { TourOverlay } from '@/components/tour/TourOverlay';
 import { getSetting, initDB } from '@/lib/db';
 import { initI18n } from '@/lib/i18n';
 import { initNotifications } from '@/lib/notifications';
+import { TourProvider } from '@/lib/tour/TourContext';
 import { PortalHost } from '@rn-primitives/portal';
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -16,6 +15,10 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+cssInterop(Image, {
+  className: 'style',
+});
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -56,7 +59,7 @@ export default function RootLayout() {
     };
 
     checkOnboarding();
-  }, [isReady, segments]);
+  }, [isReady, segments, router]);
 
   if (!isReady) {
     return (
@@ -68,21 +71,29 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <StatusBar
-          style={colorScheme === 'dark' ? 'light' : 'dark'}
-          animated
-        />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name='(tabs)' />
-          <Stack.Screen name='onboarding' />
-          <Stack.Screen name='awards/index' options={{ presentation: 'modal', headerTitle: 'Awards' }} />
-          <Stack.Screen name='settings/manage' options={{ presentation: 'modal' }} />
-          <Stack.Screen name='missions/index' options={{ presentation: 'modal' }} />
-          <Stack.Screen name='missions/pasts' options={{ presentation: 'modal' }} />
-        </Stack>
-        <PortalHost />
-      </SafeAreaProvider>
+      <AwardsProvider>
+        <SafeAreaProvider>
+          <TourProvider>
+            <StatusBar
+              style={colorScheme === 'dark' ? 'light' : 'dark'}
+              animated
+            />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name='(tabs)' />
+              <Stack.Screen name='onboarding' />
+              <Stack.Screen name='awards/index' options={{ presentation: 'modal', headerTitle: 'Awards' }} />
+              <Stack.Screen name='settings/manage' options={{ presentation: 'modal' }} />
+              <Stack.Screen name='missions/index' options={{ presentation: 'modal' }} />
+              <Stack.Screen name='missions/pasts' options={{ presentation: 'modal' }} />
+              <Stack.Screen name='calendar/index' options={{ presentation: 'modal' }} />
+              <Stack.Screen name='bankruptcy/index' options={{ presentation: 'modal' }} />
+              <Stack.Screen name='share/index' options={{ presentation: 'modal' }} />
+            </Stack>
+            <TourOverlay />
+            <PortalHost />
+          </TourProvider>
+        </SafeAreaProvider>
+      </AwardsProvider>
     </GestureHandlerRootView>
   );
 }

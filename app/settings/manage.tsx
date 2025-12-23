@@ -1,19 +1,18 @@
 import Button from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { openDatabase } from '@/lib/db';
-import { cn } from '@/lib/utils';
-import { Ionicons } from '@expo/vector-icons';
+import { getSetting, openDatabase, setSetting } from '@/lib/db'; // Added setSetting
+import { cn, formatTime } from '@/lib/utils';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type ManageType = 'apps' | 'times' | 'contexts';
+type ManageType = 'apps' | 'times' | 'contexts' | 'hobbies';
 
 interface Item {
   id: number;
@@ -21,6 +20,9 @@ interface Item {
   name_it?: string; // for apps/contexts
   minutes?: number; // for times
   is_custom: number;
+  selected?: boolean; // for hobbies
+  category?: string; // for hobbies sorting
+  category_it?: string;
 }
 
 export default function ManageScreen() {
@@ -29,26 +31,23 @@ export default function ManageScreen() {
   const params = useLocalSearchParams();
   const type = (params.type as ManageType) || 'contexts';
   const colorScheme = useColorScheme();
-  const insets = useSafeAreaInsets();
+
 
   const [items, setItems] = useState<Item[]>([]);
   const [inputVal, setInputVal] = useState('');
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  useEffect(() => {
-    loadItems();
-  }, [type]);
-
-  const getTableName = () => {
+  const getTableName = useCallback(() => {
     switch (type) {
       case 'apps': return 'apps';
       case 'times': return 'time_presets'; // table name
       case 'contexts': return 'contexts';
+      case 'hobbies': return 'hobbies';
       default: return 'contexts';
     }
-  };
+  }, [type]);
 
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     const db = await openDatabase();
     const table = getTableName();
     let query = `SELECT * FROM ${table}`;
@@ -62,7 +61,53 @@ export default function ManageScreen() {
     }
     
     const result: any[] = await db.getAllAsync(query);
-    setItems(result);
+
+    // For all types, we need to mark selected ones
+    let settingKey = '';
+    switch(type) {
+        case 'hobbies': settingKey = 'selected_hobbies'; break;
+        case 'apps': settingKey = 'selected_apps'; break;
+        case 'times': settingKey = 'selected_times'; break;
+        case 'contexts': settingKey = 'selected_contexts'; break;
+    }
+
+    const selectedJson = await getSetting(settingKey);
+    let selectedIds: number[] = [];
+    if (selectedJson) {
+        try { selectedIds = JSON.parse(selectedJson); } catch {}
+    } else {
+        // If no setting, default all to selected for times/contexts (legacy behavior was show all)
+        // For apps/hobbies default might be different but let's assume show all if undefined for consistency or keep current logic.
+        // Current logic for apps/hobbies in db.ts is "all if undefined".
+        // Let's mimic that here: if undefined, all are selected.
+        selectedIds = result.map(r => r.id);
+    }
+    
+    setItems(result.map(r => ({ ...r, selected: selectedIds.includes(r.id) })));
+  }, [type, getTableName]);
+
+  useEffect(() => {
+    loadItems();
+  }, [loadItems]);
+
+  const toggleSelection = async (id: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    
+    const newItems = items.map(item => 
+        item.id === id ? { ...item, selected: !item.selected } : item
+    );
+    setItems(newItems);
+
+    // Persist immediately
+    let settingKey = '';
+    switch(type) {
+        case 'hobbies': settingKey = 'selected_hobbies'; break;
+        case 'apps': settingKey = 'selected_apps'; break;
+        case 'times': settingKey = 'selected_times'; break;
+        case 'contexts': settingKey = 'selected_contexts'; break;
+    }
+    const selectedIds = newItems.filter(i => i.selected).map(i => i.id);
+    await setSetting(settingKey, JSON.stringify(selectedIds));
   };
 
   const addOrUpdateItem = async () => {
@@ -91,19 +136,48 @@ export default function ManageScreen() {
         if (isNaN(mins)) return;
         const res = await db.runAsync(`INSERT INTO ${table} (minutes, is_custom) VALUES (?, 1)`, mins);
         // We reload or manually add to state. State object shape depends on type.
-        // Re-fetching is safer/easier code-wise for generic logic but let's try optimistic update for speed if needed.
-        // Actually for simplicity, just reload or match shape.
-        setItems(prev => [...prev, { id: res.lastInsertRowId, minutes: mins, is_custom: 1 }].sort((a,b) => (a.minutes || 0) - (b.minutes || 0)));
+        // Auto-select new time
+        const newItem = { id: res.lastInsertRowId, minutes: mins, is_custom: 1, selected: true };
+        const newItems = [...items, newItem].sort((a,b) => (a.minutes || 0) - (b.minutes || 0));
+        setItems(newItems);
+
+        // Persist selection
+        const selectedIds = newItems.filter(i => i.selected).map(i => i.id);
+        await setSetting('selected_times', JSON.stringify(selectedIds));
       } else if (type === 'apps') {
           // Apps schema has category, defaults to something? 
           // We only provide name. SQLite allows nulls if nullable or defaults. 
           // Apps schema: name NOT NULL, category TEXT...
           const res = await db.runAsync(`INSERT INTO ${table} (name, is_custom, category) VALUES (?, 1, 'Other')`, inputVal.trim());
-          setItems(prev => [...prev, { id: res.lastInsertRowId, name: inputVal.trim(), is_custom: 1 }]);
+          
+          // Auto-select new app
+          const newItem = { id: res.lastInsertRowId, name: inputVal.trim(), is_custom: 1, selected: true };
+          const newItems = [...items, newItem];
+          setItems(newItems);
+
+          // Persist selection
+          const selectedIds = newItems.filter(i => i.selected).map(i => i.id);
+          await setSetting('selected_apps', JSON.stringify(selectedIds));
+      } else if (type === 'hobbies') {
+         const res = await db.runAsync(`INSERT INTO ${table} (name, is_custom, category) VALUES (?, 1, 'Custom')`, inputVal.trim());
+         // Auto-select new hobby
+         const newItem = { id: res.lastInsertRowId, name: inputVal.trim(), is_custom: 1, selected: true };
+         const newItems = [...items, newItem];
+         setItems(newItems);
+         // Persist selection
+         const selectedIds = newItems.filter(i => i.selected).map(i => i.id);
+         await setSetting('selected_hobbies', JSON.stringify(selectedIds));
       } else {
         // contexts
         const res = await db.runAsync(`INSERT INTO ${table} (name, is_custom) VALUES (?, 1)`, inputVal.trim());
-        setItems(prev => [...prev, { id: res.lastInsertRowId, name: inputVal.trim(), is_custom: 1 }]);
+        // Auto-select new context
+        const newItem = { id: res.lastInsertRowId, name: inputVal.trim(), is_custom: 1, selected: true };
+        const newItems = [...items, newItem];
+        setItems(newItems);
+
+        // Persist selection
+        const selectedIds = newItems.filter(i => i.selected).map(i => i.id);
+        await setSetting('selected_contexts', JSON.stringify(selectedIds));
       }
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
@@ -115,7 +189,17 @@ export default function ManageScreen() {
     const db = await openDatabase();
     const table = getTableName();
     await db.runAsync(`DELETE FROM ${table} WHERE id = ?`, id);
-    setItems(prev => prev.filter(c => c.id !== id));
+    
+    const newItems = items.filter(c => c.id !== id);
+    setItems(newItems);
+    
+    if (type === 'hobbies' || type === 'apps') {
+         // Persist selection update (in case deleted one was selected)
+         const settingKey = type === 'hobbies' ? 'selected_hobbies' : 'selected_apps';
+         const selectedIds = newItems.filter(i => i.selected).map(i => i.id);
+         await setSetting(settingKey, JSON.stringify(selectedIds));
+    }
+
     if (editingId === id) {
       setEditingId(null);
       setInputVal('');
@@ -146,6 +230,10 @@ export default function ManageScreen() {
   // Helper for display name
   const getDisplayName = (item: Item) => {
     if (type === 'times') {
+      if (!item.minutes) return '';
+      if (item.minutes >= 60) {
+        return formatTime(item.minutes, 'long');
+      }
       return `${item.minutes}m`;
     }
     return i18n.language === 'it' ? (item.name_it || item.name) : item.name;
@@ -157,6 +245,7 @@ export default function ManageScreen() {
       case 'apps': return t('settings.manage_apps');
       case 'times': return t('settings.manage_times');
       case 'contexts': return t('settings.manage_contexts');
+      case 'hobbies': return t('settings.manage_hobbies');
     }
   };
 
@@ -165,6 +254,7 @@ export default function ManageScreen() {
       case 'apps': return t('settings.system_apps');
       case 'times': return t('settings.system_times');
       case 'contexts': return t('settings.system_contexts');
+      case 'hobbies': return t('settings.system_hobbies');
     }
   };
 
@@ -173,6 +263,7 @@ export default function ManageScreen() {
       case 'apps': return t('settings.custom_apps');
       case 'times': return t('settings.custom_times');
       case 'contexts': return t('settings.custom_contexts');
+      case 'hobbies': return t('settings.custom_hobbies');
     }
   };
 
@@ -181,16 +272,19 @@ export default function ManageScreen() {
       case 'apps': return t('settings.no_custom_apps');
       case 'times': return t('settings.no_custom_times');
       case 'contexts': return t('settings.no_custom_contexts');
+      case 'hobbies': return t('settings.no_custom_hobbies');
     }
   };
 
   const getEditTitle = () => editingId ? (
     type === 'apps' ? t('settings.edit_app') :
     type === 'times' ? t('settings.edit_time') :
+    type === 'hobbies' ? t('settings.edit_hobby') :
     t('settings.edit_context')
   ) : (
     type === 'apps' ? t('settings.add_new_app') :
     type === 'times' ? t('settings.add_new_time') :
+    type === 'hobbies' ? t('settings.add_new_hobby') :
     t('settings.add_new_context')
   );
 
@@ -199,6 +293,7 @@ export default function ManageScreen() {
       case 'apps': return t('settings.app_placeholder');
       case 'times': return t('settings.time_placeholder');
       case 'contexts': return t('settings.context_placeholder');
+      case 'hobbies': return t('settings.hobby_placeholder');
     }
   };
 
@@ -231,12 +326,15 @@ export default function ManageScreen() {
               {systemItems.map(item => (
                 <Button
                   key={item.id}
-                  onPress={() => { }}
-                  variant="outline"
-                  size="lg"
-                  className="pointer-events-none opacity-80"
+                  onPress={() => {
+                      toggleSelection(item.id);
+                  }}
+                  variant={(item.selected ? 'default' : 'outline')}
+                  size="xl"
+                  className={cn(" gap-2")}
                 >
-                  <Text className="text-foreground">{getDisplayName(item)}</Text>
+                  <Text className={cn("text-black dark:text-white", item.selected && "text-white dark:text-black")}>{getDisplayName(item)}</Text>
+                  {item.selected && <Ionicons name="checkmark" size={16} color={colorScheme === 'dark' ? 'black' : 'white'} />}
                 </Button>
               ))}
             </View>
@@ -252,37 +350,58 @@ export default function ManageScreen() {
                 {customItems.map(item => (
                   <Button
                     key={item.id}
-                    onPress={() => startEditing(item)}
-                    variant={editingId === item.id ? 'default' : 'outline'}
+                    onPress={() => {
+                        toggleSelection(item.id);
+                        if (editingId) setEditingId(null); // Cancel editing if selecting another
+                    }}
+                    onLongPress={() => {
+                        // Optional: Keep long press as shortcut to edit
+                        startEditing(item);
+                    }}
+                    variant={editingId === item.id ? 'default' : (item.selected ? 'default' : 'outline')}
                     size="lg"
                   >
                     <View className="flex-row items-center gap-2">
-                      <Text className={cn('text-black dark:text-white', editingId === item.id && 'text-white dark:text-black')}>
+                       <Text className={cn('text-black dark:text-white', (editingId === item.id || item.selected) && 'text-white dark:text-black')}>
                         {getDisplayName(item)}
                       </Text>
-                      {editingId === item.id && (
-                        <Pressable
+                      {/* Edit Button for Custom Items */}
+                       <Pressable
                           onPress={() => {
-                            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-                            deleteItem(item.id);
+                             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                             startEditing(item);
                           }}
                           hitSlop={10}
-                          className="bg-black/10 dark:bg-white/20 rounded-full"
+                          className="bg-muted/20 rounded-full p-1 ml-1"
                         >
-                          <Ionicons
-                            name="close"
-                            size={12}
-                            color={editingId === item.id ? 'red' : (colorScheme === 'dark' ? 'red' : 'red')}
+                          <Feather
+                            name="edit"
+                            size={10}
+                            color={colorScheme === 'dark' ? 'black' : 'white'}
                           />
                         </Pressable>
-                      )}
+
+                      <Pressable
+                        onPress={() => {
+                          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                          deleteItem(item.id);
+                        }}
+                        hitSlop={10}
+                        className="bg-red-500/80 rounded-full p-0.5"
+                      >
+                        <Ionicons
+                          name="close"
+                          size={12}
+                          color="white"
+                        />
+                      </Pressable>
                     </View>
                   </Button>
                 ))}
               </View>
             )}
             <Text className="text-muted-foreground text-xs mt-4 ml-1">
-              {t('settings.tap_to_edit_hint')}
+              {t('settings.manage_custom_hint', 'Tap to select. Use the pencil icon to edit.')}
             </Text>
           </View>
 
@@ -318,12 +437,15 @@ export default function ManageScreen() {
                 onPress={addOrUpdateItem}
                 disabled={!inputVal.trim()}
                 className='w-fit'
-                variant='outline'
               >
                 <Ionicons
                   name={editingId ? "checkmark" : "add"}
                   size={24}
-                  color={colorScheme === 'dark' ? 'white' : editingId ? 'white' : 'black' }
+                  color={
+                    editingId && colorScheme === 'dark' ? 'black' 
+                    : editingId && colorScheme === 'light' ? 'white' 
+                    : colorScheme === 'dark' ? 'black' : 'white'
+                  }
                 />
               </Button>
             </View>
@@ -358,7 +480,7 @@ export default function ManageScreen() {
             size='xl'
             className='rounded-full w-full'
           >
-            <Text className="text-primary-foreground mx-auto font-black text-xl">{t('settings.save_manage')}</Text>
+            <Text className="text-white dark:text-black mx-auto font-semibold text-xl">{t('settings.save_manage')}</Text>
           </Button>
         </View>
       </KeyboardAvoidingView>

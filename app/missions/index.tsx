@@ -1,4 +1,3 @@
-
 import { abandonMission, AcceptedMission, completeAcceptedMission, getAcceptedMissions } from '@/lib/db';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -57,7 +56,7 @@ export default function MissionsScreen() {
 
   return (
       <View className="flex-1 bg-background">
-        <View className="flex-row items-center justify-between p-6 pb-4 border-b border-border">
+        <View className="flex-row items-center justify-between p-6 pb-4 border-b border-border/40">
           <View className="flex-row items-center flex-1">
             <TouchableOpacity 
               onPress={() => {
@@ -68,19 +67,18 @@ export default function MissionsScreen() {
               <Ionicons name="arrow-back" size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
             </TouchableOpacity>
             <View className="flex-1">
-              <Text className="text-3xl font-black text-foreground">{t('missions.title')}</Text>
-              
+              <Text className="text-3xl font-black text-foreground tracking-tighter">{t('missions.title')}</Text>
             </View>
           </View>
           
           <TouchableOpacity 
-            className="bg-secondary/80 p-3 rounded-full ml-2"
+            className="bg-secondary/70 dark:bg-primary p-3 rounded-full ml-2"
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.push('/missions/pasts');
             }}
           >
-            <Ionicons name="time-outline" size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
+            <Ionicons name="time-outline" size={24} color={colorScheme === 'dark' ? 'black' : 'white'} />
           </TouchableOpacity>
         </View>
 
@@ -89,26 +87,28 @@ export default function MissionsScreen() {
           contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
         >
           {loading ? (
-              <View className="flex-1 justify-center items-center">
-                  <ActivityIndicator size="large" />
-              </View>
+            <View className="flex-1 justify-center items-center">
+              <ActivityIndicator size="large" />
+            </View>
           ) : missions.length === 0 ? (
-              <View className="flex-1 justify-center items-center py-10">
-                  <Ionicons name="flag-outline" size={64} color="gray" />
-                  <View>
-                    <Text className="text-foreground mt-4 text-xl text-center font-black">
-                        {t('missions.no_missions_title', 'No active missions.\nGo back to accept a new challenge!')}
-                    </Text>
-                    <Text className="text-muted-foreground mt-2 max-w-xs text-center font-medium">
-                        {t('missions.no_missions_description', 'No active missions.\nGo back to accept a new challenge!')}
-                    </Text>
-                  </View>
+            <View className="flex-1 justify-center items-center py-10">
+              <Ionicons name="flag-outline" size={64} color="gray" />
+              <View>
+                <Text className="text-foreground mt-4 text-xl text-center font-black">
+                  {t('missions.no_missions_title', 'No active missions.\nGo back to accept a new challenge!')}
+                </Text>
+                <Text className="text-muted-foreground mt-2 max-w-xs text-center font-medium">
+                  {t('missions.no_missions_description', 'No active missions.\nGo back to accept a new challenge!')}
+                </Text>
               </View>
+            </View>
           ) : (
               <View className='flex-col justify-center gap-4'>
                 {missions.map(mission => {
+                  const translatedHobby = t(`hobbies.${mission.name}`, { defaultValue: mission.name });
+                  
                   return (
-                      <View key={mission.id} className="bg-card border border-border rounded-3xl p-5 mb-4">
+                      <View key={mission.id} className="bg-card/60 border border-border rounded-3xl p-5 mb-4">
                         <View className="flex-row justify-between items-start mb-4">
                           <View className="flex-row gap-3 items-center flex-1">
                             <View className={`p-3 rounded-2xl`} style={{ backgroundColor: mission.color ? `${mission.color}20` : '#80808020' }}>
@@ -120,10 +120,10 @@ export default function MissionsScreen() {
                             </View>
                             <View className="flex-1">
                               <Text className="font-bold text-lg text-foreground leading-tight">
-                                {mission.flavor_title_key ? t(mission.flavor_title_key) : mission.name}
+                                {mission.flavor_title_key ? t(mission.flavor_title_key, { hobby: translatedHobby }) : mission.name}
                               </Text>
                               <Text className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-0.5">
-                                {mission.name} • {mission.duration} min
+                                {translatedHobby} • {mission.duration} min
                               </Text>
                             </View>
                           </View>
@@ -134,7 +134,7 @@ export default function MissionsScreen() {
                         
                         {mission.flavor_desc_key && (
                           <Text className="text-muted-foreground text-sm mb-5 leading-5">
-                            {t(mission.flavor_desc_key)}
+                            {t(mission.flavor_desc_key, { hobby: translatedHobby })}
                           </Text>
                         )}
 
@@ -147,7 +147,7 @@ export default function MissionsScreen() {
                             }}
                           >
                             <Ionicons name="checkmark-circle" size={18} color={colorScheme === 'dark' ? 'black' : 'white'} />
-                            <Text className="text-primary-foreground font-bold">
+                            <Text className="text-white dark:text-black font-bold">
                               {t('missions.complete', 'Complete')}
                             </Text>
                           </TouchableOpacity>

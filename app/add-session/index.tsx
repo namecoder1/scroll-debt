@@ -1,6 +1,8 @@
+import { useAwards } from '@/components/awards/awards-provider';
 import Button from '@/components/ui/button';
-import { addSession, getSetting, openDatabase, updateSession } from '@/lib/db';
+import { addSession, getSelectedApps, getSelectedContexts, getSetting, openDatabase, updateSession } from '@/lib/db';
 import { Ionicons } from '@expo/vector-icons';
+import Slider from '@react-native-community/slider';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
@@ -8,10 +10,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { ScrollView, StyleSheet, Switch, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AddSessionScreen() {
+	const { checkAwards } = useAwards();
 	const { t, i18n } = useTranslation();
 	const router = useRouter();
 	const params = useLocalSearchParams();
@@ -27,19 +30,23 @@ export default function AddSessionScreen() {
 
   const [presets, setPresets] = useState<number[]>([]);
 
+  const [isJustNow, setIsJustNow] = useState(true);
+  const [sliderValue, setSliderValue] = useState(Math.floor(new Date().getHours() / 2) * 2);
+
 	useEffect(() => {
 		async function loadData() {
 			const db = await openDatabase();
 			// Should ideally filter by what user selected in onboarding, assuming we saved "active" apps or just show all for simplicity
 			// For now show all, maybe order by usage later.
-			const result: any[] = await db.getAllAsync('SELECT * FROM apps');
+			// Filter by what user selected in onboarding/settings
+			const result = await getSelectedApps();
 			setApps(result);
 
       // Load time presets
       const timesRes: any[] = await db.getAllAsync('SELECT * FROM time_presets ORDER BY minutes ASC');
       setPresets(timesRes.map(t => t.minutes));
 
-			const contextsRes: any[] = await db.getAllAsync('SELECT * FROM contexts');
+			const contextsRes = await getSelectedContexts();
 			setContexts(contextsRes);
 
 			if (isEditing) {
@@ -59,6 +66,7 @@ export default function AddSessionScreen() {
 			}
 		}
 		loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleSave = async () => {
@@ -68,8 +76,22 @@ export default function AddSessionScreen() {
 		if (isEditing) {
 			await updateSession(Number(params.id), mins, selectedApp || 'Unknown', customContext);
 		} else {
-			await addSession(mins, selectedApp || 'Unknown', customContext);
+      let timestamp = Date.now();
+      if (!isJustNow) {
+        const d = new Date();
+        d.setHours(sliderValue, 0, 0, 0);
+        timestamp = d.getTime();
+      }
+			await addSession(mins, selectedApp || 'Unknown', customContext, timestamp);
 		}
+		
+    // Check for new awards
+    try {
+      await checkAwards();
+    } catch (e) {
+      console.warn("Failed to check awards", e);
+    }
+
 		router.back();
 	};
 
@@ -93,6 +115,49 @@ export default function AddSessionScreen() {
 					contentContainerClassName="pb-40 pt-6"
 					showsVerticalScrollIndicator={false}
 				>
+
+					{!isEditing && (
+            <View className="mb-6">
+              <View className="bg-card border border-border rounded-3xl p-4">
+                <View className="flex-row items-center justify-between">
+                  <Text className="text-foreground text-lg font-semibold">{t('add_session.just_now_question')}</Text>
+                  <Switch
+                    trackColor={{ false: "#fff", true: colorScheme === 'dark' ? '#C9F655' : '#4D542B' }}
+                    thumbColor={isJustNow ? "#ffffff" : "#f4f3f4"}
+                    ios_backgroundColor={colorScheme === 'dark' ? '#C9F655' : '#4D542B'}
+                    onValueChange={(value) => {
+											Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+											setIsJustNow(value)
+										}}
+                    value={isJustNow}
+                  />
+                </View>
+
+                {!isJustNow && (
+                  <View className="mt-4">
+                    <Text className="text-foreground text-base mb-2">
+                      {t('add_session.at_time')} {String(sliderValue).padStart(2, '0')}:00
+                    </Text>
+                    <Slider
+                      style={{ width: '100%', height: 40 }}
+                      minimumValue={0}
+                      maximumValue={22}
+                      step={1}
+                      value={sliderValue}
+                      onValueChange={(value) => {
+												Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+												setSliderValue(value)
+											}}
+                      minimumTrackTintColor={colorScheme === 'dark' ? '#C9F655' : '#4D542B'}
+                      maximumTrackTintColor={colorScheme === 'dark' ? '#d3d3d3' : '#e4e4e4'}
+                      thumbTintColor={colorScheme === 'dark' ? '#C9F655' : '#4D542B'}
+                    />
+                  </View>
+                )}
+              </View>
+            </View>
+          )}
+
 					{/* Presets */}
 					<Text className="text-foreground text-lg font-semibold mb-3">{t('add_session.duration_label')}</Text>
 					<View className="flex-row flex-wrap gap-2.5 mb-4">
@@ -103,10 +168,10 @@ export default function AddSessionScreen() {
 									Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 									setDuration(min.toString())
 								}}
-								size="lg"
+								size="xl"
 								className={`${duration === min.toString() ? 'bg-primary border-primary' : 'bg-card border-border'}`}
 							>
-								<Text className={`${duration === min.toString() ? 'text-primary-foreground' : 'text-foreground'}`}>
+								<Text className={`${duration === min.toString() ? 'text-white dark:text-black' : 'text-foreground'}`}>
 									{min >= 60 ? Math.floor(min / 60) : min}
 									{min < 60 ? ' ' + t('add_session.minutes') : min === 60 ? ' ' + t('add_session.hour') : ' ' + t('add_session.hours')}
 								</Text>
@@ -124,10 +189,10 @@ export default function AddSessionScreen() {
 									Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 									setSelectedApp(app.name)
 								}}
-								size="lg"
+								size="xl"
 								className={`${selectedApp === app.name ? 'bg-primary border-primary' : 'bg-card border-border'}`}
 							>
-								<Text className={`${selectedApp === app.name ? 'text-primary-foreground' : 'text-foreground'}`}>
+								<Text className={`${selectedApp === app.name ? 'text-white dark:text-black' : 'text-foreground'}`}>
 									{i18n.language === 'it' ? (app.name_it || app.name) : app.name}
 								</Text>
 							</Button>
@@ -140,14 +205,14 @@ export default function AddSessionScreen() {
 						{contexts.map(ctx => (
 							<Button
 								key={ctx.id}
-								size='lg'
+								size='xl'
 								onPress={() => {
 									Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 									setCustomContext(ctx.name)
 								}}
 								className={`${customContext === ctx.name ? 'bg-primary border-primary' : 'bg-card border-border'}`}
 							>
-								<Text className={`${customContext === ctx.name ? 'text-primary-foreground' : 'text-foreground'}`}>
+								<Text className={`${customContext === ctx.name ? 'text-white dark:text-black' : 'text-foreground'}`}>
 									{i18n.language === 'it' ? (ctx.name_it || ctx.name) : ctx.name}
 								</Text>
 							</Button>
@@ -177,16 +242,14 @@ export default function AddSessionScreen() {
 				<View className="absolute bottom-6 left-6 right-6">
 					<Button
 						onPress={() => {
-							Haptics.notificationAsync(
-								Haptics.NotificationFeedbackType.Success
-							)
+							Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
 							handleSave()
 						}}
 						className='w-full rounded-full'
 						disabled={!duration || !selectedApp}
 						size="xl"
 					>
-						<Text className="text-primary-foreground mx-auto text-center font-black text-xl">{isEditing ? t('add_session.update_session') : t('add_session.confess_debt')}</Text>
+						<Text className="text-white dark:text-black mx-auto text-center font-semibold text-xl">{isEditing ? t('add_session.update_session') : t('add_session.confess_debt')}</Text>
 					</Button>
 				</View>
 			</View>

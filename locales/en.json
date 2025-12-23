@@ -1,8 +1,38 @@
 {
   "welcome": "Welcome",
+  "common": {
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "tour": {
+    "next": "Next",
+    "skip": "Skip",
+    "finish": "Finish",
+    "budget_title": "Check your daily budget",
+    "budget_desc": "This section is for you to check the status of your budget, don't forget to look at it!",
+    "stats_title": "Analyze statistics",
+    "stats_desc": "Don't forget to analyze your statistics! The app shows many and they say a lot about you!",
+    "add_title": "Add session",
+    "add_desc": "Add a session to register the time you spent scrolling.",
+    "settings_title": "Settings",
+    "settings_desc": "Set your preferences and customize the app according to your tastes and cases",
+    "open_settings": "Open Settings",
+    "defaults_title": "Add on the fly!",
+    "defaults_desc": "This section allows you to define defaults for sessions, so you don't have to type the same information every time.",
+    "missions_title": "Missions",
+    "missions_desc": "Complete offline missions to pay back your scroll debt.",
+    "awards_title": "Awards / Badges",
+    "awards_desc": "Track your achievements and see the badges you've unlocked."
+  },
   "settings": {
+    "new_feature": "New feature",
+    "bankruptcy": "Bankruptcy Mode",
+    "bankruptcy_desc": "Fight against your scroll debt in an even more effective and difficult way!",
+    "bankruptcy_more": "Click for more details",
     "title": "Settings",
     "language": "Language",
+    "retake_tour": "Retake the Tour",
+    "retake_tour_description": "Fast and complete",
     "achievements": "Achievements",
     "view_badges": "View your badges",
     "daily_goal": "Daily Goal",
@@ -27,26 +57,45 @@
     "manage_contexts": "Manage Contexts",
     "manage_apps": "Manage Apps",
     "manage_times": "Manage Times",
+    "manage_hobbies": "Manage Hobbies",
+    "manage_hobbies_desc": "Select or add your hobbies",
+    "manage_hobbies_hint": "Tap to select, hold to edit custom ones",
     "system_contexts": "System Contexts",
     "system_apps": "System Apps",
     "system_times": "System Times",
+    "system_hobbies": "System Hobbies",
     "custom_contexts": "Custom Contexts",
-    "custom_apps": "Custom Apps",
     "custom_times": "Custom Times",
+    "custom_apps": "Custom Apps",
+    "custom_hobbies": "Custom Hobbies",
     "no_custom_contexts": "No custom contexts yet.",
     "no_custom_apps": "No custom apps yet.",
     "no_custom_times": "No custom times yet.",
+    "no_custom_hobbies": "No custom hobbies yet.",
     "tap_to_edit_hint": "Tap on a custom item to edit or delete it.",
     "edit_context": "Edit Context",
     "edit_app": "Edit App",
     "edit_time": "Edit Time",
+    "edit_hobby": "Edit Hobby",
     "add_new_context": "Add New Context",
     "add_new_app": "Add New App",
     "add_new_time": "Add New Time",
+    "add_new_hobby": "Add New Hobby",
     "context_placeholder": "e.g. Library",
     "app_placeholder": "e.g. My App",
     "time_placeholder": "Minutes (e.g. 10)",
-    "save_manage": "Done"
+    "hobby_placeholder": "e.g. Reading",
+    "save_manage": "Done",
+    "created_by": "Created by",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "security": "Security",
+    "faq": "FAQ",
+    "calendar": {
+      "title": "Calendar",
+      "no_log": "No log",
+      "daily_usage": "Daily Usage"
+    }
   },
   "tabs": {
     "home": "Home",
@@ -54,20 +103,28 @@
     "settings": "Settings"
   },
   "analytics": {
+    "share": "Share", 
+    "completion_rate": "Completed missions",
+    "top_context": "Top context",
+    "all_time": "All Time",
+    "this_week": "This Week",
     "title": "Analytics",
     "no_data_title": "No Data Yet",
     "no_data": "Still no data to display. Start logging your scroll sessions to see your habits here!",
+    "no_data_short": "N/A",
     "lifetime_statistics": "Lifetime Statistics",
     "monthly_trend": "Monthly Trend",
     "hot_hours": "Hot Hours",
     "total_debt": "Total Scroll Debt",
+    "total_usage": "Total Usage",
     "time_spent_desc": "Time spent scrolling across {{count}} sessions",
-    "daily_avg": "Daily Avg",
+    "daily_avg": "Daily Avg.",
     "longest_run": "Longest Run",
     "activity_by_time": "Activity by Time of Day",
     "most_active_day": "Most active day",
     "recent_activity": "Recent Activity",
-    "last_7_days": "Last 7 days",
+    "last_7_days": "This week",
+    "most_used": "Most used",
     "day_parts": {
       "morning": "Morning",
       "afternoon": "Afternoon",
@@ -116,6 +173,9 @@
   },
   "awards": {
     "title": "Awards",
+    "congratulations": "Congratulations!",
+    "unlocked_message": "You have unlocked a new badge.",
+    "close": "Close",
     "locked": "Locked",
     "unlocked": "Unlocked",
     "badges": {
@@ -158,7 +218,35 @@
       "zen": {
         "title": "Scroll Free",
         "desc": "Record 0 minutes of scroll debt in a day."
+      },
+      "social_detox_1": {
+        "title": "Digital Detox",
+        "desc": "Go 24 hours without using any social apps."
+      },
+      "social_detox_2": {
+        "title": "Clean Break",
+        "desc": "Go 48 hours without using any social apps."
+      },
+      "social_detox_3": {
+        "title": "Deep Cleanse",
+        "desc": "Go 3 days without using any social apps."
+      },
+      "mission_daily_1": {
+        "title": "Mission Accomplished",
+        "desc": "Complete 1 mission."
+      },
+      "mission_daily_2": {
+        "title": "Double Strike",
+        "desc": "Complete 2 missions in a single day."
+      },
+      "mission_daily_3": {
+        "title": "Mission Spree",
+        "desc": "Complete 3 missions in a single day."
       }
+    },
+    "groups": {
+      "social_detox": "Digital Detox Series",
+      "mission_daily": "Mission Master Series"
     }
   },
   "onboarding": {
@@ -168,21 +256,26 @@
       "feature_1": "We track your scroll time",
       "feature_2": "The app calculates your debt",
       "feature_3": "You pay it back with offline fun",
-      "start": "START"
+      "start": "Start",
+      "back": "Back",
+      "next": "Next",
+      "start_onboarding": "Start Onboarding"
     },
     "apps": {
       "title": "Your weak habits",
       "subtitle": "Where does your time disappear?",
       "missing": "Something missing?",
       "placeholder": "e.g. LinkedIn",
-      "continue": "Continue"
+      "continue": "Continue",
+      "at_least": "Select at least 1 app"
     },
     "hobbies": {
       "title": "Your hobbies",
       "subtitle": "Things you love doing offline.",
       "missing": "Something missing?",
       "placeholder": "e.g. Pottery",
-      "next": "Next"
+      "next": "Next",
+      "at_least": "Select at least 1 hobby"
     },
     "budget": {
       "title": "Set your limit",
@@ -195,12 +288,22 @@
         "doomscroller": "Doomscroller"
       },
       "finish": "Start the Journey"
+    },
+    "guide": {
+      "step_1_title": "Your Time Isn't Free.",
+      "step_1_desc": "Every minute you doomscroll adds to your Scroll Debt. The algorithm is charging you interest, and you're paying with your life.",
+      "step_2_title": "Pay It Back. In Real Life.",
+      "step_2_desc": "Don't just feel guilty—do something. Complete Offline Missions to clear your debt. Squat, draw, breathe, or just touch grass.",
+      "step_3_title": "Adventure Against Yourself.",
+      "step_3_desc": "Earn badges, unlock streaks, and prove you're not a bot. Turn your digital detox into your biggest high score."
     }
   },
   "home": {
     "log_scroll_session": "Log Scroll Session",
     "your_daily_budget": "Daily Budget",
     "scroll_sessions": "Scroll Sessions",
+    "scroll_sessions_description": "Manage and view your sessions.",
+    "scroll_sessions_more": "See more",
     "no_sessions_yet": "No sessions yet",
     "edit_session": "Edit Session",
     "delete_session": "Delete Session",
@@ -223,12 +326,77 @@
     "mission_complete": "Mission Complete!",
     "mission_complete_desc": "Excellent work. Debt reduced.",
     "rescue_day": "Rescue Day",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "calendar_view": "Calendar View",
+    "calendar_view_description": "View your scroll history in a calendar view.",
+    "bankruptcy_risk": "Bankruptcy Risk",
+    "bankruptcy_threshold": "{{current}}m / {{max}}m Debt (incl. today)",
+    "bankruptcy_explanation": "Debt accumulates when you exceed your daily budget. If it reaches 500m, you declare bankruptcy and lose your progress.",
+    "tap_for_info": "Tap for more info",
+    "bankruptcy_modal": {
+        "title": "Bankruptcy Protocol",
+        "warning_title": "Hardcore Mode Active",
+        "warning_desc": "You have enabled high-stakes accountability. Your debt is not just a number—it has consequences.",
+        "mechanism_title": "How Debt Accumulates",
+        "mechanism_desc": "Every minute you spend scrolling BEYOND your daily budget is added to your permanent debt record. Unused budget is lost; it does not offset previous debt.",
+        "limit_title": "The 500m Threshold",
+        "limit_desc": "Your debt cap is 500 minutes. This is a hard limit. The moment your accumulated debt + today's overage crosses this line, bankruptcy is declared immediately.",
+        "consequences_title": "Consequences",
+        "consequence_1": "All accumulated Debt is wiped.",
+        "consequence_2": "All Unlocked Awards & Badges are permanently lost.",
+        "consequence_3": "Your Streak is reset to zero.",
+        "got_it": "I Understand the Risks",
+        "remaining": "remaining until collapse",
+        "disabled": "Bankruptcy Mode is disabled"
+    },
+    "bankruptcy_declared": {
+        "title": "BANKRUPTCY DECLARED",
+        "desc": "Your total debt (past + today) hit 500m. Protocols engaged: Awards Wiped. Streak Reset."
+    }
+  },
+  "hobbies": {
+    "Drawing": "Drawing",
+    "Painting": "Painting",
+    "Writing": "Writing",
+    "Photography": "Photography",
+    "Pottery": "Pottery",
+    "Knitting": "Knitting",
+    "Origami": "Origami",
+    "Calligraphy": "Calligraphy",
+    "DIY": "DIY",
+    "Model Building": "Model Building",
+    "Sports": "Sports",
+    "Walking": "Walking",
+    "Running": "Running",
+    "Cycling": "Cycling",
+    "Swimming": "Swimming",
+    "Hiking": "Hiking",
+    "Gym": "Gym",
+    "Dancing": "Dancing",
+    "Yoga": "Yoga",
+    "Reading": "Reading",
+    "Meditation": "Meditation",
+    "Gardening": "Gardening",
+    "Fishing": "Fishing",
+    "Bird Watching": "Bird Watching",
+    "Star Gazing": "Star Gazing",
+    "Playing Instrument": "Playing Instrument",
+    "Cooking": "Cooking",
+    "Coding": "Coding",
+    "Singing": "Singing",
+    "Magic Tricks": "Magic Tricks",
+    "Gaming": "Gaming",
+    "Board Games": "Board Games",
+    "Puzzles": "Puzzles",
+    "Movies": "Movies",
+    "Traveling": "Traveling",
+    "Collecting": "Collecting"
   },
   "missions": {
     "title": "Missions",
     "target": "Target",
     "reward": "Reward",
+    "complete": "Complete",
     "history": "Missions Log",
     "subtitle": "Complete missions to reduce the debt",
     "no_missions_title": "No active missions",
@@ -423,7 +591,20 @@
       "title_14": "Mission: Flash Journal",
       "desc_14": "Write in 3 sentences what you did today and how you feel.",
       "title_15": "Task: Intentional Nothing",
+      "task": "Intentional Nothing",
       "desc_15": "For 2 minutes, do absolutely nothing… on purpose."
+    },
+    "custom": {
+      "title_1": "Time for {{hobby}}",
+      "desc_1": "Spend 15 minutes focusing purely on {{hobby}}.",
+      "title_2": "Project: {{hobby}}",
+      "desc_2": "Dedicate time to improve your {{hobby}} skills.",
+      "title_3": "Mission: {{hobby}}",
+      "desc_3": "Enjoy a session of {{hobby}} without distractions.",
+      "title_4": "Focus: {{hobby}}",
+      "desc_4": "Immerse yourself in {{hobby}} for a while.",
+      "title_5": "Operation: {{hobby}}",
+      "desc_5": "Make progress on your {{hobby}} projects today."
     }
   },
   "rescue": {
@@ -433,6 +614,8 @@
     "give_up": "I Give Up",
     "success_title": "You did it!",
     "success_subtitle": "You reclaimed {{minutes}} minutes of your life.",
+    "notification_title": "Rescue Session Complete!",
+    "notification_body": "You have successfully completed your rescue session.",
     "close": "Close"
   },
   "quotes": {
@@ -519,6 +702,10 @@
     "which_app": "Which App?",
     "context_optional": "Context (Optional)",
     "confess_debt": "Add",
-    "update_session": "Update Session"
+    "update_session": "Update Session",
+    "when": "When?",
+    "just_now_question": "Just finished?",
+    "time_of_day": "Time",
+    "at_time": "At"
   }
 }

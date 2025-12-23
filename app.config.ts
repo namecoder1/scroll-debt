@@ -10,19 +10,19 @@ const getAppName = () => {
 };
 
 const getUniqueIdentifier = () => {
-  if (IS_DEV) return "com.bbartoz.scrolldebt.dev";
-  if (IS_PREVIEW) return "com.bbartoz.scrolldebt.preview";
-  return "com.bbartoz.scrolldebt";
+  if (IS_DEV) return "com.bbartoz.scrolldebtapp.dev";
+  if (IS_PREVIEW) return "com.bbartoz.scrolldebtapp.preview";
+  return "com.bbartoz.scrolldebtapp";
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: getAppName(),
   slug: "scroll-debt",
-  version: "1.0.0",
+  version: "1.2.0",
   orientation: "portrait",
   icon: "./assets/icons/ios-light.png",
-  scheme: "scrolldebt",
+  scheme: "scrolldebtapp",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
   ios: {
@@ -35,7 +35,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: getUniqueIdentifier(),
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
-    },
+    }
   },
   android: {
     adaptiveIcon: {

@@ -1,11 +1,41 @@
 {
   "welcome": "Benvenuto",
+  "common": {
+    "today": "Oggi",
+    "yesterday": "Ieri"
+  },
+  "tour": {
+    "next": "Avanti",
+    "skip": "Salta",
+    "finish": "Fine",
+    "budget_title": "Controlla il tuo budget giornaliero",
+    "budget_desc": "Questa sezione ti serve per controllare lo stato del tuo budget, non dimenticarti di guardarla!",
+    "stats_title": "Analizza le statistiche",
+    "stats_desc": "Non dimenticarti di analizzare le tue statistiche! L'app ne mostra tante e dicono tanto su di te!",
+    "add_title": "Aggiungi sessione",
+    "add_desc": "Aggiungi una sessione per registrare il tempo che hai passato a scrollare.",
+    "settings_title": "Impostazioni",
+    "settings_desc": "Imposta le tue preferenze e personalizza l'app secondo i tuoi gusti e casistiche",
+    "open_settings": "Apri Impostazioni",
+    "defaults_title": "Aggiungi al volo!",
+    "defaults_desc": "Questa sezione ti permette di definire dei predefiniti per le sessioni, così da non dover digitare ogni volta le stesse informazioni.",
+    "missions_title": "Missioni",
+    "missions_desc": "Completa missioni offline per ripagare il tuo debito di scroll.",
+    "awards_title": "Premi / Badge",
+    "awards_desc": "Tieni traccia dei tuoi risultati e vedi i badge che hai sbloccato."
+  },
   "settings": {
+    "new_feature": "Novità",
+    "bankruptcy": "Modalità Bancarotta",
+    "bankruptcy_desc": "Combatti contro il tuo debito di scroll in modo ancora più efficace e difficle!",
+    "bankruptcy_more": "Clicca per maggiori dettagli",
     "title": "Impostazioni",
+    "retake_tour": "Ripeti il Tour",
+    "retake_tour_description": "Veloce ed esaustivo",
     "language": "Lingua",
     "achievements": "Obiettivi",
-    "view_badges": "Guarda i tuoi badge",
-    "daily_goal": "Obiettivo Giornaliero",
+    "view_badges": "Ammira il tuo progresso",
+    "daily_goal": "Il tuo Budget",
     "strict": "Severo",
     "normal": "Normale",
     "balanced": "Bilanciato",
@@ -27,26 +57,45 @@
     "manage_contexts": "Gestisci Contesti",
     "manage_apps": "Gestisci App",
     "manage_times": "Gestisci Tempi",
+    "manage_hobbies": "Gestisci Hobby",
+    "manage_hobbies_desc": "Seleziona o aggiungi i tuoi hobby",
+    "manage_hobbies_hint": "Tocca per selezionare, tieni premuto per disattivare/eliminare",
     "system_contexts": "Contesti di Sistema",
     "system_apps": "App di Sistema",
     "system_times": "Tempi di Sistema",
+    "system_hobbies": "Hobby di Sistema",
     "custom_contexts": "Contesti Personalizzati",
+    "custom_times": "Tempi personalizzati",
     "custom_apps": "App Personalizzate",
-    "custom_times": "Tempi Personalizzati",
+    "custom_hobbies": "Hobby Personalizzati",
     "no_custom_contexts": "Nessun contesto personalizzato.",
     "no_custom_apps": "Nessuna app personalizzata.",
     "no_custom_times": "Nessun tempo personalizzato.",
+    "no_custom_hobbies": "Nessun hobby personalizzato.",
     "tap_to_edit_hint": "Tocca un elemento personalizzato per modificarlo o eliminarlo.",
     "edit_context": "Modifica Contesto",
     "edit_app": "Modifica App",
     "edit_time": "Modifica Tempo",
+    "edit_hobby": "Modifica Hobby",
     "add_new_context": "Aggiungi Contesto",
     "add_new_app": "Aggiungi App",
     "add_new_time": "Aggiungi Tempo",
+    "add_new_hobby": "Aggiungi Hobby",
     "context_placeholder": "es. Biblioteca",
     "app_placeholder": "es. La Mia App",
     "time_placeholder": "Minuti (es. 10)",
-    "save_manage": "Fatto"
+    "hobby_placeholder": "es. Lettura",
+    "save_manage": "Fatto",
+    "created_by": "Creato da",
+    "privacy": "Politica Privacy",
+    "terms": "Termini di utilizzo",
+    "security": "Sicurezza",
+    "faq": "FAQ",
+    "calendar": {
+      "title": "Calendario",
+      "no_log": "No Data",
+      "daily_usage": "Utilizzo Giornaliero"
+    }
   },
   "tabs": {
     "home": "Home",
@@ -54,20 +103,31 @@
     "settings": "Impostazioni"
   },
   "analytics": {
+    "share": "Condividi", 
+    "completion_rate": "Missioni completate",
+    "top_context": "Contesto più comune",
     "title": "Analisi",
+    "all_time": "Tutto",
+    "this_week": "Questa settimana",
+    "this_month": "Questo mese",
     "no_data_title": "Nessun Dato",
     "no_data": "Ancora nessun dato da mostrare. Inizia a registrare le sessioni per vedere i tuoi dati qui!",
+    "no_data_short": "N/A",
     "lifetime_statistics": "Statistiche Totali",
     "monthly_trend": "Trend Mensile",
     "hot_hours": "Ore Calde",
     "total_debt": "Debito totale",
+    "total_usage": "Utilizzo totale",
     "time_spent_desc": "Tempo speso a scrollare in {{count}} sessioni",
     "daily_avg": "Media Giornaliera",
+    "activity_trend": "Trend Attività",
+    "weekly_hot_apps": "App più popolari",
     "longest_run": "Sessione più lunga",
     "activity_by_time": "Attività per Fascia Oraria",
     "most_active_day": "Giorno più attivo",
-    "recent_activity": "Attività Recente",
-    "last_7_days": "Ultimi 7 giorni",
+    "recent_activity": "Attività",
+    "last_7_days": "Questa settimana",
+    "most_used": "Più usato",
     "day_parts": {
       "morning": "Mattina",
       "afternoon": "Pomeriggio",
@@ -115,7 +175,10 @@
     "net_debt": "Debito Netto"
   },
   "awards": {
-    "title": "Premi",
+    "title": "Obiettivi",
+    "congratulations": "Congratulazioni!",
+    "unlocked_message": "Hai sbloccato un nuovo badge.",
+    "close": "Chiudi",
     "locked": "Bloccato",
     "unlocked": "Sbloccato",
     "badges": {
@@ -158,7 +221,35 @@
       "zen": {
         "title": "Libero dallo Scroll",
         "desc": "Registra 0 minuti di debito scroll in un giorno."
+      },
+      "social_detox_1": {
+        "title": "Detox Digitale",
+        "desc": "Passa 24 ore senza usare app social."
+      },
+      "social_detox_2": {
+        "title": "Pausa Rigenerante",
+        "desc": "Passa 48 ore senza usare app social."
+      },
+      "social_detox_3": {
+        "title": "Pulizia Profonda",
+        "desc": "Passa 3 giorni senza usare app social."
+      },
+      "mission_daily_1": {
+        "title": "Missione Compiuta",
+        "desc": "Completa 1 missione."
+      },
+      "mission_daily_2": {
+        "title": "Doppio Colpo",
+        "desc": "Completa 2 missioni in un singolo giorno."
+      },
+      "mission_daily_3": {
+        "title": "Raffica di Missioni",
+        "desc": "Completa 3 missioni in un singolo giorno."
       }
+    },
+    "groups": {
+      "social_detox": "Serie Detox Digitale",
+      "mission_daily": "Serie Maestro delle Missioni"
     }
   },
   "onboarding": {
@@ -168,21 +259,26 @@
       "feature_1": "Tracciamo il tempo di scroll",
       "feature_2": "L'app calcola il tuo debito",
       "feature_3": "Lo ripaghi con divertimento offline",
-      "start": "INIZIA"
+      "start": "Inizia",
+      "back": "Indietro",
+      "next": "Avanti",
+      "start_onboarding": "Inizia ora"
     },
     "apps": {
       "title": "Le tue debolezze",
       "subtitle": "Dove sparisce il tuo tempo?",
       "missing": "Manca qualcosa?",
       "placeholder": "es. LinkedIn",
-      "continue": "Continua"
+      "continue": "Continua",
+      "at_least": "Seleziona almeno 1 app"
     },
     "hobbies": {
       "title": "I tuoi hobby",
       "subtitle": "Cose che ami fare offline.",
       "missing": "Manca qualcosa?",
       "placeholder": "es. Ceramica",
-      "next": "Avanti"
+      "next": "Avanti",
+      "at_least": "Seleziona almeno 1 hobby"
     },
     "budget": {
       "title": "Imposta il limite",
@@ -195,12 +291,22 @@
         "doomscroller": "Doomscroller"
       },
       "finish": "Inizia il Viaggio"
+    },
+    "guide": {
+      "step_1_title": "Il tuo tempo non è gratis.",
+      "step_1_desc": "Ogni minuto di doomscrolling aumenta il tuo Debito. L'algoritmo ti sta addebitando gli interessi, e stai pagando con la tua vita.",
+      "step_2_title": "Ripagalo. Nella vita reale.",
+      "step_2_desc": "Non sentirti solo in colpa—fai qualcosa. Completa Missioni Offline per saldare il debito. Fai squat, disegna, respira o tocca l'erba.",
+      "step_3_title": "Un'avventura contro te stesso.",
+      "step_3_desc": "Guadagna badge, sblocca serie e dimostra di non essere un bot. Trasforma il tuo detox digitale nel tuo record migliore."
     }
   },
   "home": {
     "log_scroll_session": "Registra Sessione",
     "your_daily_budget": "Budget Giornaliero",
     "scroll_sessions": "Sessioni di Scroll",
+    "scroll_sessions_description": "Gestisci e visualizza le tue sessioni.",
+    "scroll_sessions_more": "Di più",
     "no_sessions_yet": "Nessuna sessione ancora",
     "edit_session": "Modifica Sessione",
     "delete_session": "Elimina Sessione",
@@ -209,8 +315,8 @@
     "daily_wisdom": "Citazione del momento",
     "past_7_days": "Ultimi 7 Giorni",
     "breakdown": "Riepilogo",
-    "top_apps": "App Principali",
-    "contexts": "Contesti",
+    "top_apps": "Dove spendi più tempo?",
+    "contexts": "Quando spendi più tempo?",
     "no_data": "Ancora non ci sono dati da mostrare",
     "streak": "Streak",
     "payback_missions": "Missioni di Recupero",
@@ -223,12 +329,80 @@
     "mission_complete": "Missione Compiuta!",
     "mission_complete_desc": "Ottimo lavoro. Debito ridotto.",
     "rescue_day": "Salva la Giornata",
-    "dismiss": "Esci"
+    "dismiss": "Esci",
+    "calendar_view": "Modalità Calendario",
+    "calendar_view_description": "Analizza le tue sessioni sul calendario.",
+    "bankruptcy_risk": "Rischio Bancarotta",
+    "bankruptcy_threshold": "{{current}}m / {{max}}m Debito (incluso oggi)",
+    "bankruptcy_explanation": "Il debito si accumula quando superi il budget giornaliero. Se raggiunge i 500m, dichiari bancarotta e perdi i tuoi progressi.",
+    "tap_for_info": "Tocca per info",
+    "bankruptcy_modal": {
+        "title": "Protocollo Bancarotta",
+        "warning_title": "Modalità Hardcore Attiva",
+        "warning_desc": "Hai attivato la responsabilità ad alto rischio. Il tuo debito non è solo un numero: ha delle conseguenze.",
+        "mechanism_title": "Come si Accumula il Debito",
+        "mechanism_desc": "Ogni minuto passato a scrollare OLTRE il tuo budget giornaliero viene aggiunto al registro del debito. Il budget non utilizzato va perso; non compensa il debito precedente.",
+        "limit_title": "La Soglia di 500m",
+        "limit_desc": "Il limite di debito è 500 minuti. È un limite rigido. Nel momento in cui il debito accumulato + lo sforo di oggi superano questa linea, viene dichiarata immediatamente la bancarotta.",
+        "consequences_title": "Conseguenze",
+        "consequence_1": "Tutto il Debito accumulato viene cancellato.",
+        "consequence_2": "Tutti i Premi e Badge sbloccati vengono persi permanentemente.",
+        "consequence_3": "La tua serie (Streak) viene azzerata.",
+        "got_it": "Capisco i Rischi",
+        "remaining": "rimasti alla bancarotta",
+        "disabled": "Modalita non abilitata"
+    },
+    "bankruptcy_declared": {
+        "title": "BANCAROTTA DICHIARATA",
+        "desc": "Il tuo debito totale (passato + oggi) ha toccato i 500m. Protocolli attivi: Premi Cancellati. Streak Azzerata."
+    }
+
+  },
+  "hobbies": {
+    "Drawing": "Disegno",
+    "Painting": "Pittura",
+    "Writing": "Scrittura",
+    "Photography": "Fotografia",
+    "Pottery": "Ceramica",
+    "Knitting": "Lavoro a maglia",
+    "Origami": "Origami",
+    "Calligraphy": "Calligrafia",
+    "DIY": "Fai da te",
+    "Model Building": "Modellismo",
+    "Sports": "Sport",
+    "Walking": "Camminata",
+    "Running": "Corsa",
+    "Cycling": "Ciclismo",
+    "Swimming": "Nuoto",
+    "Hiking": "Escursionismo",
+    "Gym": "Palestra",
+    "Dancing": "Ballo",
+    "Yoga": "Yoga",
+    "Reading": "Lettura",
+    "Meditation": "Meditazione",
+    "Gardening": "Giardinaggio",
+    "Fishing": "Pesca",
+    "Bird Watching": "Bird Watching",
+    "Star Gazing": "Osservare le stelle",
+    "Playing Instrument": "Suonare uno strumento",
+    "Cooking": "Cucina",
+    "Coding": "Programmazione",
+    "Singing": "Canto",
+    "Magic Tricks": "Giochi di magia",
+    "Gaming": "Videogiochi",
+    "Board Games": "Giochi da tavolo",
+    "Puzzles": "Puzzle",
+    "Movies": "Film",
+    "Traveling": "Viaggiare",
+    "Collecting": "Collezionismo"
   },
   "missions": {
     "title": "Missioni",
     "target": "Obiettivo",
     "reward": "Ricompensa",
+    "complete": "Completa",
+    "no_history": "Nessuna missione ancora",
+    "no_history_description": "Torna alla pagina Home per accettare una nuova missione!",
     "history": "Storico Missioni",
       "subtitle": "Completa missioni per ridurre il debito",
       "no_missions_title": "Nessuna missione attiva",
@@ -424,15 +598,29 @@
         "desc_14": "Scrivi in 3 frasi cosa hai fatto oggi e come ti senti.",
         "title_15": "Task: Nulla Intenzionale",
         "desc_15": "Per 2 minuti non fare assolutamente nulla… ma fallo di proposito."
-      }
+      },
+    "custom": {
+      "title_1": "Tempo per {{hobby}}",
+      "desc_1": "Dedica 15 minuti a {{hobby}} senza distrazioni.",
+      "title_2": "Progetto: {{hobby}}",
+      "desc_2": "Lavora per migliorare nel tuo hobby: {{hobby}}.",
+      "title_3": "Missione: {{hobby}}",
+      "desc_3": "Goditi una sessione di {{hobby}} in pace.",
+      "title_4": "Focus: {{hobby}}",
+      "desc_4": "Immergiti completamente in {{hobby}} per un po'.",
+      "title_5": "Operazione: {{hobby}}",
+      "desc_5": "Fai progressi nei tuoi progetti di {{hobby}} oggi."
+    }
     },
   "rescue": {
-    "title": "Modalità Rescue",
+    "title": "Modalità di recupero",
     "subtitle": "Metti giù il telefono e salva la giornata.",
     "timer_desc": "Non chiudere l'app. Respira, o fai altro.",
     "give_up": "Mi Arrendo",
     "success_title": "Ce l'hai fatta!",
     "success_subtitle": "Hai recuperato {{minutes}} minuti della tua vita.",
+    "notification_title": "Sessione Rescue Completata!",
+    "notification_body": "Hai completato con successo la tua sessione di rescue.",
     "close": "Chiudi"
   },
   "quotes": {
@@ -511,15 +699,19 @@
   },
   "add_session": {
     "edit_title": "Modifica Sessione",
-    "add_title": "Aggiungi Debito",
-    "duration_label": "Durata (minuti)",
+    "add_title": "Aggiungi",
+    "duration_label": "Durata",
     "minutes": "minuti",
     "hour": "ora",
     "hours": "ore",
-    "which_app": "Quale App?",
-    "context_optional": "Contesto (Opzionale)",
+    "which_app": "App",
+    "context_optional": "Contesto",
     "confess_debt": "Aggiungi",
-    "update_session": "Aggiorna Sessione"
+    "update_session": "Aggiorna Sessione",
+    "when": "Quando?",
+    "just_now_question": "Appena terminata?",
+    "time_of_day": "Orario",
+    "at_time": "Ore:"
   }
 }
 

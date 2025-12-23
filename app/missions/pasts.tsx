@@ -32,7 +32,7 @@ export default function PastMissionsScreen() {
   return (
     <View className="flex-1 bg-background">
       <View
-        className="flex-row items-center p-6 pb-6 border-b border-border"
+        className="flex-row items-center p-6 pb-6 border-b border-border/40"
       >
         <TouchableOpacity
           onPress={() => {
@@ -43,7 +43,7 @@ export default function PastMissionsScreen() {
         >
           <Ionicons name="arrow-back" size={24} color={colorScheme === 'dark' ? 'white' : 'black'} />
         </TouchableOpacity>
-        <Text className="text-3xl font-black text-foreground">{t('missions.history', 'Mission Log')}</Text>
+        <Text className="text-3xl font-black text-foreground tracking-tighter">{t('missions.history', 'Mission Log')}</Text>
       </View>
 
       <ScrollView
@@ -55,16 +55,23 @@ export default function PastMissionsScreen() {
             <ActivityIndicator size="large" />
           </View>
         ) : missions.length === 0 ? (
-          <View className="flex-1 justify-center items-center opacity-50 mt-20">
+          <View className="flex-1 justify-center items-center mt-20">
             <Ionicons name="time-outline" size={64} color="gray" />
-            <Text className="text-muted-foreground mt-4 text-center font-medium">
-              {t('missions.no_history', 'No completed missions yet.')}
-            </Text>
+            <View>
+              <Text className="text-foreground mt-4 text-xl text-center font-black">
+                {t('missions.no_history', 'No completed missions yet.')}
+              </Text>
+              <Text className="text-muted-foreground mt-2 max-w-xs text-center font-medium">
+                {t('missions.no_history_description', 'No completed missions yet.')}
+              </Text>
+            </View>
           </View>
         ) : (
           <View className="flex-col gap-4">
             {missions.map((mission) => {
               const date = new Date(mission.timestamp);
+              const translatedHobby = t(`hobbies.${mission.name}`, { defaultValue: mission.name });
+
               return (
                 <View key={mission.id} className="bg-card border border-border rounded-3xl p-5">
                   <View className="flex-row justify-between items-start">
@@ -81,7 +88,7 @@ export default function PastMissionsScreen() {
                       </View>
                       <View className="flex-1">
                         <Text className="font-bold text-base text-foreground leading-tight">
-                          {mission.flavor_title_key ? t(mission.flavor_title_key) : mission.name}
+                          {mission.flavor_title_key ? t(mission.flavor_title_key, { hobby: translatedHobby }) : mission.name}
                         </Text>
                         <Text className="text-xs text-muted-foreground font-medium mt-0.5">
                           {date.toLocaleDateString()} • {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

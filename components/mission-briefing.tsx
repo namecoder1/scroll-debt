@@ -41,7 +41,7 @@ export default function MissionBriefing({ visible, onClose, onAccept, onAlreadyD
              <View className={`p-4 rounded-full border-4 border-card`} style={{ backgroundColor: mission.color }}>
                 <Ionicons name={mission.icon} size={40} color="white" />
              </View>
-             <View className="bg-secondary px-3 py-1 rounded-full mt-2 border border-border">
+             <View className="bg-muted px-3 py-1 rounded-full mt-2 border border-border">
                 <Text className="text-xs font-bold uppercase text-foreground tracking-widest">{t('home.mission_briefing')}</Text>
              </View>
           </View>
@@ -49,20 +49,28 @@ export default function MissionBriefing({ visible, onClose, onAccept, onAlreadyD
           {/* Content */}
           <View className="items-center mb-8">
             <Text className="text-2xl font-black text-center text-foreground mb-2 leading-tight">
-               {t(mission.flavor.titleKey)}
+               {t(mission.flavor.titleKey, { 
+                   hobby: mission.category === 'Custom' || !t(`hobbies.${mission.name}`, { defaultValue: '' }) 
+                       ? mission.name 
+                       : t(`hobbies.${mission.name}`, { defaultValue: mission.name }) 
+               })}
             </Text>
             
             <Text className="text-center text-muted-foreground font-medium text-base mb-6 px-4">
-               {t(mission.flavor.descriptionKey)}
+               {t(mission.flavor.descriptionKey, { 
+                   hobby: mission.category === 'Custom' || !t(`hobbies.${mission.name}`, { defaultValue: '' }) 
+                       ? mission.name 
+                       : t(`hobbies.${mission.name}`, { defaultValue: mission.name }) 
+               })}
             </Text>
 
             {/* Stats */}
-            <View className="flex-row gap-4">
-                <View className="bg-secondary/50 p-3 rounded-2xl items-center min-w-[100px]">
+            <View className="flex-row">
+                <View className="bg-muted p-3 rounded-l-2xl items-center min-w-[100px]">
                     <Text className="text-xs font-bold text-muted-foreground uppercase mb-1">{t('missions.target')}</Text>
-                    <Text className="text-lg font-black text-foreground">{mission.name}</Text>
+                    <Text className="text-lg font-black text-foreground">{t(`hobbies.${mission.name}`, { defaultValue: mission.name })}</Text>
                 </View>
-                <View className="bg-green-500/10 p-3 rounded-2xl items-center min-w-[100px]">
+                <View className="bg-green-500/10 p-3 rounded-r-2xl items-center min-w-[100px]">
                     <Text className="text-xs font-bold text-green-600 uppercase mb-1">{t('missions.reward')}</Text>
                     <Text className="text-lg font-black text-green-600">-{mission.duration}m</Text>
                 </View>
@@ -78,17 +86,7 @@ export default function MissionBriefing({ visible, onClose, onAccept, onAlreadyD
                     onAccept();
                 }}
             >
-                <Text className="text-primary-foreground font-bold text-lg">{t('home.accept_mission')}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-                className="bg-secondary w-full py-4 rounded-2xl items-center"
-                onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    onAlreadyDone();
-                }}
-            >
-                <Text className="text-muted-foreground font-semibold">{t('home.already_completed')}</Text>
+                <Text className="text-white dark:text-black font-bold text-lg">{t('home.accept_mission')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
