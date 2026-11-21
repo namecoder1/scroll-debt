@@ -1,0 +1,4 @@
+nodeLinker: hoisted
+allowBuilds:
+  fsevents: true
+  unrs-resolver: true
